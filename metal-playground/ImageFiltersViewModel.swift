@@ -18,24 +18,12 @@ final class ImageFiltersViewModel {
     
     private var metalContext = MetalContext()
     
-    @ObservationIgnored private var grayscaleFuncPSO: MTLComputePipelineState?
-    
     @ObservationIgnored private var commandBuffer: MTLCommandBuffer?
     @ObservationIgnored private var inputTexture: MTLTexture?
     @ObservationIgnored private var outputTexture: MTLTexture?
     
     
     init() {
-        guard let function = metalContext.library.makeFunction(name: "grayscale") else {
-            print("Grayscale function not found")
-            return
-        }
-        
-        do {
-            grayscaleFuncPSO = try metalContext.device.makeComputePipelineState(function: function)
-        } catch {
-            print("Error: \(error.localizedDescription)")
-        }
         
     }
     
@@ -43,7 +31,12 @@ final class ImageFiltersViewModel {
         
         displayImage = image
         loadTextures(image: image)
-        processGrayscale()
+        
+        do {
+            try processGrayscale()
+        } catch {
+            print("Erorr: \(error.localizedDescription)")
+        }
     }
     
     func loadTextures(image: UIImage) {
@@ -75,15 +68,14 @@ final class ImageFiltersViewModel {
         outputTexture = metalContext.device.makeTexture(descriptor: outputDescriptor)
     }
     
-    func processGrayscale() {
+    func processGrayscale() throws {
         
         guard let inputTexture = inputTexture else { return }
         guard let outputTexture = outputTexture else { return }
-        guard let grayscaleFuncPSO = grayscaleFuncPSO else { return }
         guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
-        computeEncoder.setComputePipelineState(grayscaleFuncPSO)
+        computeEncoder.setComputePipelineState(try metalContext.pipelineStateObjects.grayscale)
         computeEncoder.setTexture(inputTexture, index: 0)
         computeEncoder.setTexture(outputTexture, index: 1)
         

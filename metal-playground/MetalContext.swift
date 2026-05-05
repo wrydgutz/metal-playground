@@ -13,6 +13,10 @@ final class MetalContext {
     let library: MTLLibrary
     let commandQueue: MTLCommandQueue
     
+    var pipelineStateObjects: PipelineStateObjects {
+        .init(metalContext: self)
+    }
+    
     init() {
         guard let device = MTLCreateSystemDefaultDevice() else {
             fatalError("Metal is not supported on this device")
@@ -29,5 +33,28 @@ final class MetalContext {
         self.device = device
         self.library = library
         self.commandQueue = commandQueue
+        
+    }
+}
+
+extension MetalContext {
+    
+    final class PipelineStateObjects {
+        
+        let metalContext: MetalContext
+        
+        init(metalContext: MetalContext) {
+            self.metalContext = metalContext
+        }
+        
+        var grayscale: MTLComputePipelineState {
+            get throws {
+                guard let function = metalContext.library.makeFunction(name: "grayscale") else {
+                    fatalError("Could not load function 'grayscale'")
+                }
+                
+                return try metalContext.device.makeComputePipelineState(function: function)
+            }
+        }
     }
 }

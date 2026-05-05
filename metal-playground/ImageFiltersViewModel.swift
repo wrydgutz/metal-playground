@@ -16,9 +16,7 @@ final class ImageFiltersViewModel {
     
     var displayImage: UIImage?
     
-    @ObservationIgnored private var device: MTLDevice?
-    @ObservationIgnored private var library: MTLLibrary?
-    @ObservationIgnored private var commandQueue: MTLCommandQueue?
+    private var metalContext = MetalContext()
     
     @ObservationIgnored private var grayscaleFuncPSO: MTLComputePipelineState?
     
@@ -28,17 +26,13 @@ final class ImageFiltersViewModel {
     
     
     init() {
-        device = MTLCreateSystemDefaultDevice()
-        library = device?.makeDefaultLibrary()
-        commandQueue = device?.makeCommandQueue()
-        
-        guard let function = library?.makeFunction(name: "grayscale") else {
+        guard let function = metalContext.library.makeFunction(name: "grayscale") else {
             print("Grayscale function not found")
             return
         }
         
         do {
-            grayscaleFuncPSO = try device?.makeComputePipelineState(function: function)
+            grayscaleFuncPSO = try metalContext.device.makeComputePipelineState(function: function)
         } catch {
             print("Error: \(error.localizedDescription)")
         }
@@ -54,10 +48,9 @@ final class ImageFiltersViewModel {
     
     func loadTextures(image: UIImage) {
         
-        guard let device = device else { return }
         guard let cgImage = image.cgImage else { return }
         
-        let loader = MTKTextureLoader(device: device)
+        let loader = MTKTextureLoader(device: metalContext.device)
         
         do {
             inputTexture = try loader.newTexture(
@@ -79,16 +72,15 @@ final class ImageFiltersViewModel {
         outputDescriptor.usage = [.shaderRead, .shaderWrite]
         outputDescriptor.storageMode = .shared
         
-        outputTexture = device.makeTexture(descriptor: outputDescriptor)
+        outputTexture = metalContext.device.makeTexture(descriptor: outputDescriptor)
     }
     
     func processGrayscale() {
         
         guard let inputTexture = inputTexture else { return }
         guard let outputTexture = outputTexture else { return }
-        guard let commandQueue = commandQueue else { return }
         guard let grayscaleFuncPSO = grayscaleFuncPSO else { return }
-        guard let commandBuffer = commandQueue.makeCommandBuffer() else { return }
+        guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
         computeEncoder.setComputePipelineState(grayscaleFuncPSO)

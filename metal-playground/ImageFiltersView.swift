@@ -11,12 +11,13 @@ import PhotosUI
 struct ImageFiltersView: View {
     
     @State private var selectedItem: PhotosPickerItem?
-    @State private var image: UIImage?
+    
+    @State private var viewModel = ImageFiltersViewModel()
     
     var body: some View {
         VStack {
             VStack {
-                if let image {
+                if let image = viewModel.displayImage {
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFit()
@@ -37,7 +38,7 @@ struct ImageFiltersView: View {
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self),
                    let uiImage = UIImage(data: data) {
-                    image = uiImage
+                    viewModel.process(image: uiImage)
                 }
             }
         }

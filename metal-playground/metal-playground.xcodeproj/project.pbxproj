@@ -11,6 +11,8 @@
 		9E0618182FA9DDFF00264A1D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0618172FA9DDFF00264A1D /* ContentView.swift */; };
 		9E06181A2FA9DDFF00264A1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9E0618192FA9DDFF00264A1D /* Assets.xcassets */; };
 		9E0618502FA9DFB700264A1D /* ImageFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E06184F2FA9DFB700264A1D /* ImageFiltersView.swift */; };
+		9E0618542FAA01D500264A1D /* ImageFiltersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0618532FAA01D000264A1D /* ImageFiltersViewModel.swift */; };
+		9E0618562FAA0DF900264A1D /* grayscale.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0618552FAA0DF900264A1D /* grayscale.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +21,8 @@
 		9E0618172FA9DDFF00264A1D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		9E0618192FA9DDFF00264A1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9E06184F2FA9DFB700264A1D /* ImageFiltersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFiltersView.swift; sourceTree = "<group>"; };
+		9E0618532FAA01D000264A1D /* ImageFiltersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFiltersViewModel.swift; sourceTree = "<group>"; };
+		9E0618552FAA0DF900264A1D /* grayscale.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = grayscale.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,7 +42,9 @@
 				9E0618192FA9DDFF00264A1D /* Assets.xcassets */,
 				9E0618172FA9DDFF00264A1D /* ContentView.swift */,
 				9E06184F2FA9DFB700264A1D /* ImageFiltersView.swift */,
+				9E0618532FAA01D000264A1D /* ImageFiltersViewModel.swift */,
 				9E0618152FA9DDFF00264A1D /* MetalPlaygroundApp.swift */,
+				9E0618552FAA0DF900264A1D /* grayscale.metal */,
 				9E0618132FA9DDFF00264A1D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -123,8 +129,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E0618562FAA0DF900264A1D /* grayscale.metal in Sources */,
 				9E0618182FA9DDFF00264A1D /* ContentView.swift in Sources */,
 				9E0618162FA9DDFF00264A1D /* MetalPlaygroundApp.swift in Sources */,
+				9E0618542FAA01D500264A1D /* ImageFiltersViewModel.swift in Sources */,
 				9E0618502FA9DFB700264A1D /* ImageFiltersView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

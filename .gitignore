@@ -60,3 +60,14 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+
+# System Files
+*.DS_Store
+.DS_Store
+
+# Config Files
+*.xcconfig
+
+# SwiftPM
+swiftpm/

@@ -17,9 +17,11 @@ struct ImageFiltersView: View {
     var body: some View {
         VStack {
             VStack {
-                if let texture = viewModel.displayTexture {
-                    MetalTextureView(metalContext: viewModel.metalContext, texture: texture)
-                        .scaledToFit()
+                if viewModel.isProcessed && !viewModel.filters.isEmpty {
+                    if let texture = viewModel.filters[viewModel.filter] {
+                        MetalTextureView(metalContext: viewModel.metalContext, texture: texture)
+                            .scaledToFit()
+                    }
                 }
             }
             .frame(height: 500)
@@ -29,7 +31,23 @@ struct ImageFiltersView: View {
             Spacer()
             
             HStack {
-                // TODO: Add Filter Options
+                if viewModel.isProcessed && !viewModel.filters.isEmpty {
+                    ForEach(ImageFilter.allCases) { filter in
+                        if let texture = viewModel.filters[filter] {
+                            Button {
+                                viewModel.filter = filter
+                            } label: {
+                                VStack {
+                                    Text(filter.title)
+                                        .font(.caption)
+                                        .foregroundStyle(.black)
+                                    MetalTextureView(metalContext: viewModel.metalContext, texture: texture)
+                                }
+                            }
+                            .frame(width: 100, height: 100)
+                        }
+                    }
+                }
             }
         }
         .navigationTitle("Image Filters")

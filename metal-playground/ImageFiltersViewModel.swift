@@ -10,79 +10,89 @@ import Observation
 import Metal
 import MetalKit
 
-@MainActor
+enum ImageFilter: CaseIterable, Identifiable {
+    case original
+    case grayscale
+    
+    var id: Self { self }
+    var title: String {
+        switch self {
+            case .original: "Original"
+            case .grayscale: "Grayscale"
+        }
+    }
+    
+    func pipelineStateObject(metalContext: MetalContext) throws -> MTLComputePipelineState? {
+        switch self {
+            case .grayscale: return try metalContext.pipelineStateObjects.grayscale
+            default: return nil
+        }
+    }
+}
+
 @Observable
 final class ImageFiltersViewModel {
     
-    var displayTexture: MTLTexture?
-    
+    var filter = ImageFilter.original
+    var isProcessed = false
+    @ObservationIgnored var filters = [ImageFilter:MTLTexture]()
     @ObservationIgnored var metalContext = MetalContext()
     
-    @ObservationIgnored private var commandBuffer: MTLCommandBuffer?
-    @ObservationIgnored private var inputTexture: MTLTexture?
-    @ObservationIgnored private var outputTexture: MTLTexture?
-    
-    
-    init() {
-        
-    }
-    
     func process(image: UIImage) {
+        isProcessed = false
         
         guard let cgImage = image.cgImage else { return }
         
         let loader = MTKTextureLoader(device: metalContext.device)
         
         do {
-            displayTexture = try loader.newTexture(
-                cgImage: cgImage,
-                options: [
-                    .origin: MTKTextureLoader.Origin.topLeft
-                ]
-            )
-        } catch {
-            print("Error: \(error.localizedDescription)")
-        }
-    }
-    
-    func loadTextures(image: UIImage) {
-        
-        guard let cgImage = image.cgImage else { return }
-        
-        let loader = MTKTextureLoader(device: metalContext.device)
-        
-        do {
-            inputTexture = try loader.newTexture(
-                cgImage: cgImage,
-                options: [
-                    .origin: MTKTextureLoader.Origin.topLeft
-                ]
-            )
+            let texture = try loader.newTexture(cgImage: cgImage)
+            loadFilterTextures(original: texture)
+            try processFilters()
         } catch {
             print("Error: \(error.localizedDescription)")
         }
         
-        
-        guard let inputTexture = inputTexture else { return }
-        
-        let outputDescriptor = MTLTextureDescriptor.texture2DDescriptor(pixelFormat: .bgra8Unorm,
-                                                                        width: inputTexture.width,
-                                                                        height: inputTexture.height,
-                                                                        mipmapped: false)
-        outputDescriptor.usage = [.shaderRead, .shaderWrite]
-        outputDescriptor.storageMode = .shared
-        
-        outputTexture = metalContext.device.makeTexture(descriptor: outputDescriptor)
+        isProcessed = true
     }
     
-    func processGrayscale() throws {
+    func loadFilterTextures(original: MTLTexture) {
         
-        guard let inputTexture = inputTexture else { return }
-        guard let outputTexture = outputTexture else { return }
+        let descriptor = MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: .bgra8Unorm,
+            width: original.width,
+            height: original.height,
+            mipmapped: false
+        )
+        descriptor.usage = [.shaderRead, .shaderWrite]
+        descriptor.storageMode = .shared
+        
+        filters[.original] = original
+        
+        for name in ImageFilter.allCases {
+            if name == .original { continue }
+            filters[name] = metalContext.device.makeTexture(descriptor: descriptor)
+        }
+    }
+    
+    func processFilters() throws {
+        for name in ImageFilter.allCases {
+            if name == .original { continue }
+            guard let pipelineStateObject = try name.pipelineStateObject(metalContext: metalContext) else { continue }
+            process(filter: .grayscale, pipelineState: pipelineStateObject)
+        }
+    }
+    
+    func process(filter: ImageFilter, pipelineState: MTLComputePipelineState) {
+        
+        guard filter != .original else { return }
+        guard !filters.isEmpty else { return }
+        guard let inputTexture = filters[.original] else { return }
+        guard let outputTexture = filters[filter] else { return }
         guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
-        computeEncoder.setComputePipelineState(try metalContext.pipelineStateObjects.grayscale)
+        computeEncoder.setComputePipelineState(pipelineState)
         computeEncoder.setTexture(inputTexture, index: 0)
         computeEncoder.setTexture(outputTexture, index: 1)
         
@@ -99,54 +109,5 @@ final class ImageFiltersViewModel {
         commandBuffer.commit()
         
         commandBuffer.waitUntilCompleted()
-        
-//        displayImage = makeUIImage(from: outputTexture)
-    }
-    
-    func makeUIImage(from texture: MTLTexture) -> UIImage? {
-        let width = texture.width
-        let height = texture.height
-        let bytesPerPixel = 4
-        let bytesPerRow = width * bytesPerPixel
-        let byteCount = bytesPerRow * height
-        
-        var bytes = [UInt8](repeating: 0, count: byteCount)
-        
-        let region = MTLRegionMake2D(0, 0, width, height)
-        texture.getBytes(&bytes,
-                         bytesPerRow: bytesPerRow,
-                         from: region,
-                         mipmapLevel: 0)
-        
-        guard texture.pixelFormat == .bgra8Unorm else {
-            assertionFailure("makeUIImage(from:) expects bgra8Unorm")
-            return nil
-        }
-        
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo: CGBitmapInfo = [
-            .byteOrder32Little,
-            CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue)
-        ]
-        
-        guard let provider = CGDataProvider(data: Data(bytes) as CFData) else {
-            return nil
-        }
-        
-        guard let cgImage = CGImage(width: width,
-                                    height: height,
-                                    bitsPerComponent: 8,
-                                    bitsPerPixel: 32,
-                                    bytesPerRow: bytesPerRow,
-                                    space: colorSpace,
-                                    bitmapInfo: bitmapInfo,
-                                    provider: provider,
-                                    decode: nil,
-                                    shouldInterpolate: false,
-                                    intent: .defaultIntent) else {
-            return nil
-        }
-        
-        return UIImage(cgImage: cgImage)
     }
 }

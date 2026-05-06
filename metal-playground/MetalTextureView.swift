@@ -41,39 +41,37 @@ extension MetalTextureView {
         var texture: MTLTexture
         
         private var vertexBuffer: MTLBuffer
-        private var viewportSize: vector_uint2 = .zero
+        private var viewportSize: CGSize = .zero
         
         
         init(metalContext: MetalContext, texture: MTLTexture) {
             self.metalContext = metalContext
             self.texture = texture
             
-            let vertices: [MetalContext.TextureViewVertexData] = [
-                .init(positionPixels: [500, -500], textureCoordinate: [1.0, 1.0]),
-                .init(positionPixels: [-500, -500], textureCoordinate: [0.0, 1.0]),
-                .init(positionPixels: [-500, 500], textureCoordinate: [0.0, 0.0]),
-            
-                .init(positionPixels: [500, -500], textureCoordinate: [1.0, 1.0]),
-                .init(positionPixels: [-500, 500], textureCoordinate: [0.0, 0.0]),
-                .init(positionPixels: [500, 500], textureCoordinate: [1.0, 0.0])
-            ]
+            // Initialize the vertex buffer.
+            let vertices = [MetalContext.TextureViewVertexData].init(
+                repeating: .init(positionPixels: [0.0, 0.0], textureCoordinate: [0.0, 0.0]),
+                count: 6
+            )
             
             guard let vertexBuffer = metalContext.device.makeBuffer(
                 bytes: vertices,
                 length: vertices.count * MemoryLayout<MetalContext.TextureViewVertexData>.stride) else {
                 fatalError("Could not create vertex buffer")
             }
+            
             self.vertexBuffer = vertexBuffer
         }
         
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-            viewportSize.x = UInt32(size.width)
-            viewportSize.y = UInt32(size.height)
+            viewportSize = size
         }
         
         func draw(in view: MTKView) {
             guard let drawable = view.currentDrawable else { return }
             guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
+            
+            updateVertices()
             
             // Draw into texture, clear it first, keep the result.
             // i.e. Draw once
@@ -95,7 +93,9 @@ extension MetalTextureView {
             
             // Set vertex shader args
             encoder.setVertexBuffer(vertexBuffer, offset: 0, index: 0)
-            encoder.setVertexBytes(&viewportSize, length: MemoryLayout<vector_uint2>.size, index: 1)
+            
+            var viewportSizeVec = vector_uint2(UInt32(viewportSize.width), UInt32(viewportSize.height))
+            encoder.setVertexBytes(&viewportSizeVec, length: MemoryLayout<vector_uint2>.size, index: 1)
             
             // Set fragment shader args
             encoder.setFragmentTexture(texture, index: 0)
@@ -105,6 +105,31 @@ extension MetalTextureView {
             
             commandBuffer.present(drawable)
             commandBuffer.commit()
+        }
+        
+        private func updateVertices() {
+            
+            // Compute for the quad's vertices.
+            // The vertices are computed to fit the texture to the viewport.
+            let textureSize = CGSize(width: texture.width, height: texture.height)
+            let scale = min(viewportSize.width / textureSize.width, viewportSize.height / textureSize.height)
+            let quadSize = CGSize(width: textureSize.width * scale, height: textureSize.height * scale)
+            let halfExtents: (Float, Float) = (Float(quadSize.width) * 0.5, Float(quadSize.height) * 0.5)
+            
+            let vertices: [MetalContext.TextureViewVertexData] = [
+                .init(positionPixels: [halfExtents.0, -halfExtents.1], textureCoordinate: [1.0, 1.0]),
+                .init(positionPixels: [-halfExtents.0, -halfExtents.1], textureCoordinate: [0.0, 1.0]),
+                .init(positionPixels: [-halfExtents.0, halfExtents.1], textureCoordinate: [0.0, 0.0]),
+
+                .init(positionPixels: [halfExtents.0, -halfExtents.1], textureCoordinate: [1.0, 1.0]),
+                .init(positionPixels: [-halfExtents.0, halfExtents.1], textureCoordinate: [0.0, 0.0]),
+                .init(positionPixels: [halfExtents.0, halfExtents.1], textureCoordinate: [1.0, 0.0])
+            ]
+            
+            let length = vertices.count * MemoryLayout<MetalContext.TextureViewVertexData>.stride
+            let _ = vertices.withUnsafeBytes { raw in
+                memcpy(vertexBuffer.contents(), raw.baseAddress!, length)
+            }
         }
     }
 }

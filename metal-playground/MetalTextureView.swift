@@ -11,10 +11,10 @@ import MetalKit
 struct MetalTextureView: UIViewRepresentable {
     
     let metalContext: MetalContext
-    let texture: MTLTexture?
+    let texture: MTLTexture
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(metalContext: metalContext)
+        Coordinator(metalContext: metalContext, texture: texture)
     }
     
     func makeUIView(context: Context) -> MTKView {
@@ -38,13 +38,15 @@ extension MetalTextureView {
     final class Coordinator: NSObject, MTKViewDelegate {
         
         private let metalContext: MetalContext
-        var texture: MTLTexture?
+        var texture: MTLTexture
         
         private var vertexBuffer: MTLBuffer
         private var viewportSize: vector_uint2 = .zero
         
-        init(metalContext: MetalContext) {
+        
+        init(metalContext: MetalContext, texture: MTLTexture) {
             self.metalContext = metalContext
+            self.texture = texture
             
             let vertices: [MetalContext.TextureViewVertexData] = [
                 .init(positionPixels: [500, -500], textureCoordinate: [1.0, 1.0]),
@@ -108,5 +110,37 @@ extension MetalTextureView {
 }
 
 #Preview {
-    MetalTextureView(metalContext: MetalContext(), texture: nil)
+    let metalContext = MetalContext()
+    
+    let texture: MTLTexture = {
+        let descriptor = MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: .bgra8Unorm,
+            width: 2,
+            height: 2,
+            mipmapped: false
+        )
+        descriptor.usage = [.shaderRead]
+        descriptor.storageMode = .shared
+        
+        let texture = metalContext.device.makeTexture(descriptor: descriptor)!
+        
+        // BGRA8: 2x2 pixels (blue, green, red, white)
+        let bytes: [UInt8] = [
+            255, 0, 0, 255,
+            0, 255, 0, 255,
+            0, 0, 255, 255,
+            255, 255, 255, 255
+        ]
+        
+        texture.replace(
+            region: MTLRegionMake2D(0, 0, 2, 2),
+            mipmapLevel: 0,
+            withBytes: bytes,
+            bytesPerRow: 2 * 4
+        )
+        
+        return texture
+    }()
+    
+    MetalTextureView(metalContext: metalContext, texture: texture)
 }

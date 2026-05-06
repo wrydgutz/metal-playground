@@ -20,10 +20,11 @@ struct MetalTextureView: UIViewRepresentable {
     func makeUIView(context: Context) -> MTKView {
         let view = MTKView(frame: .zero, device: metalContext.device)
         view.colorPixelFormat = .bgra8Unorm
-        view.clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1)
         view.delegate = context.coordinator
         view.isPaused = true
         view.enableSetNeedsDisplay = true
+        view.isOpaque = false
+        view.backgroundColor = .clear
         return view
     }
     
@@ -88,7 +89,7 @@ extension MetalTextureView {
             let descriptor = MTLRenderPassDescriptor()
             descriptor.colorAttachments[0].texture = drawable.texture
             descriptor.colorAttachments[0].loadAction = .clear
-            descriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.0)
+            descriptor.colorAttachments[0].clearColor = MTLClearColor()
             descriptor.colorAttachments[0].storeAction = .store
             
             guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor) else {

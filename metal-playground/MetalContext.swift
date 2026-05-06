@@ -56,5 +56,26 @@ extension MetalContext {
                 return try metalContext.device.makeComputePipelineState(function: function)
             }
         }
+        
+        var textureView: MTLRenderPipelineState {
+            get throws {
+                guard let vertexFunction = metalContext.library.makeFunction(name: "textureView_vertex"),
+                      let fragmentFunction = metalContext.library.makeFunction(name: "textureView_fragment") else {
+                    fatalError("Could not load functions for texture view")
+                }
+                
+                let descriptor = MTLRenderPipelineDescriptor()
+                descriptor.vertexFunction = vertexFunction
+                descriptor.fragmentFunction = fragmentFunction
+                descriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+                
+                return try metalContext.device.makeRenderPipelineState(descriptor: descriptor)
+            }
+        }
+    }
+    
+    struct TextureViewVertexData {
+        let position: SIMD2<Float>
+        let texcoord: SIMD2<Float>
     }
 }

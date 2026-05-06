@@ -17,9 +17,8 @@ struct ImageFiltersView: View {
     var body: some View {
         VStack {
             VStack {
-                if let image = viewModel.displayImage {
-                    Image(uiImage: image)
-                        .resizable()
+                if let texture = viewModel.displayTexture {
+                    MetalTextureView(metalContext: viewModel.metalContext, texture: texture)
                         .scaledToFit()
                 }
             }

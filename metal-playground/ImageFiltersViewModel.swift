@@ -14,9 +14,9 @@ import MetalKit
 @Observable
 final class ImageFiltersViewModel {
     
-    var displayImage: UIImage?
+    var displayTexture: MTLTexture?
     
-    private var metalContext = MetalContext()
+    @ObservationIgnored var metalContext = MetalContext()
     
     @ObservationIgnored private var commandBuffer: MTLCommandBuffer?
     @ObservationIgnored private var inputTexture: MTLTexture?
@@ -29,13 +29,19 @@ final class ImageFiltersViewModel {
     
     func process(image: UIImage) {
         
-        displayImage = image
-        loadTextures(image: image)
+        guard let cgImage = image.cgImage else { return }
+        
+        let loader = MTKTextureLoader(device: metalContext.device)
         
         do {
-            try processGrayscale()
+            displayTexture = try loader.newTexture(
+                cgImage: cgImage,
+                options: [
+                    .origin: MTKTextureLoader.Origin.topLeft
+                ]
+            )
         } catch {
-            print("Erorr: \(error.localizedDescription)")
+            print("Error: \(error.localizedDescription)")
         }
     }
     
@@ -49,12 +55,13 @@ final class ImageFiltersViewModel {
             inputTexture = try loader.newTexture(
                 cgImage: cgImage,
                 options: [
-                    .origin: MTKTextureLoader.Origin.flippedVertically
+                    .origin: MTKTextureLoader.Origin.topLeft
                 ]
             )
         } catch {
             print("Error: \(error.localizedDescription)")
         }
+        
         
         guard let inputTexture = inputTexture else { return }
         
@@ -93,7 +100,7 @@ final class ImageFiltersViewModel {
         
         commandBuffer.waitUntilCompleted()
         
-        displayImage = makeUIImage(from: outputTexture)
+//        displayImage = makeUIImage(from: outputTexture)
     }
     
     func makeUIImage(from texture: MTLTexture) -> UIImage? {

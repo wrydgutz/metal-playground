@@ -47,13 +47,13 @@ extension MetalTextureView {
             self.metalContext = metalContext
             
             let vertices: [MetalContext.TextureViewVertexData] = [
-                .init(position: [500, -500], texcoord: [1.0, 1.0]),
-                .init(position: [-500, -500], texcoord: [0.0, 1.0]),
-                .init(position: [-500, 500], texcoord: [0.0, 0.0]),
+                .init(positionPixels: [500, -500], textureCoordinate: [1.0, 1.0]),
+                .init(positionPixels: [-500, -500], textureCoordinate: [0.0, 1.0]),
+                .init(positionPixels: [-500, 500], textureCoordinate: [0.0, 0.0]),
             
-                .init(position: [500, -500], texcoord: [1.0, 1.0]),
-                .init(position: [-500, 500], texcoord: [0.0, 0.0]),
-                .init(position: [500, 500], texcoord: [1.0, 0.0])
+                .init(positionPixels: [500, -500], textureCoordinate: [1.0, 1.0]),
+                .init(positionPixels: [-500, 500], textureCoordinate: [0.0, 0.0]),
+                .init(positionPixels: [500, 500], textureCoordinate: [1.0, 0.0])
             ]
             
             guard let vertexBuffer = metalContext.device.makeBuffer(
@@ -97,6 +97,7 @@ extension MetalTextureView {
             
             // Set fragment shader args
             encoder.setFragmentTexture(texture, index: 0)
+            
             encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
             encoder.endEncoding()
             

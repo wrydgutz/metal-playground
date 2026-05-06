@@ -59,8 +59,8 @@ extension MetalContext {
         
         var textureView: MTLRenderPipelineState {
             get throws {
-                guard let vertexFunction = metalContext.library.makeFunction(name: "textureView_vertex"),
-                      let fragmentFunction = metalContext.library.makeFunction(name: "textureView_fragment") else {
+                guard let vertexFunction = metalContext.library.makeFunction(name: "textureViewVertex"),
+                      let fragmentFunction = metalContext.library.makeFunction(name: "textureViewFragment") else {
                     fatalError("Could not load functions for texture view")
                 }
                 
@@ -74,8 +74,9 @@ extension MetalContext {
         }
     }
     
+    /// Mirrors `TextureView.metal`'s `VertexData`.
     struct TextureViewVertexData {
-        let position: SIMD2<Float>
-        let texcoord: SIMD2<Float>
+        let positionPixels: SIMD2<Float>
+        let textureCoordinate: SIMD2<Float>
     }
 }

@@ -39,9 +39,10 @@ final class ImageFiltersViewModel {
     @ObservationIgnored var metalContext = MetalContext()
     
     func process(image: UIImage) {
-        isProcessed = false
-        
         guard let cgImage = image.cgImage else { return }
+        
+        isProcessed = false
+        filter = .original
         
         let loader = MTKTextureLoader(device: metalContext.device)
         

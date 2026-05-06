@@ -97,7 +97,7 @@ extension MetalTextureView {
             }
             
             do {
-                encoder.setRenderPipelineState(try metalContext.pipelineStateObjects.textureView)
+                encoder.setRenderPipelineState(try metalContext.pipelineStateObjects.textureView())
             } catch {
                 print("Error: \(error.localizedDescription)")
             }

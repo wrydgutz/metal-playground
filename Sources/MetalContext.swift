@@ -13,9 +13,9 @@ final class MetalContext {
     let library: MTLLibrary
     let commandQueue: MTLCommandQueue
     
-    var pipelineStateObjects: PipelineStateObjects {
-        .init(metalContext: self)
-    }
+    lazy var pipelineStateObjects: PipelineStateObjects = {
+        PipelineStateObjects(device: device, library: library)
+    }()
     
     init() {
         guard let device = MTLCreateSystemDefaultDevice() else {
@@ -33,7 +33,6 @@ final class MetalContext {
         self.device = device
         self.library = library
         self.commandQueue = commandQueue
-        
     }
 }
 
@@ -41,36 +40,44 @@ extension MetalContext {
     
     final class PipelineStateObjects {
         
-        let metalContext: MetalContext
+        let device: MTLDevice
+        let library: MTLLibrary
         
-        init(metalContext: MetalContext) {
-            self.metalContext = metalContext
+        init(device: MTLDevice, library: MTLLibrary) {
+            self.device = device
+            self.library = library
         }
         
-        var grayscale: MTLComputePipelineState {
-            get throws {
-                guard let function = metalContext.library.makeFunction(name: "grayscale") else {
-                    fatalError("Could not load function 'grayscale'")
-                }
-                
-                return try metalContext.device.makeComputePipelineState(function: function)
+        private var cachedGrayscale: MTLComputePipelineState?
+        func grayscale() throws -> MTLComputePipelineState {
+            if let cachedGrayscale = cachedGrayscale { return cachedGrayscale }
+            
+            guard let function = library.makeFunction(name: "grayscale") else {
+                fatalError("Could not load function 'grayscale'")
             }
+            
+            let grayscale = try device.makeComputePipelineState(function: function)
+            cachedGrayscale = grayscale
+            return grayscale
         }
         
-        var textureView: MTLRenderPipelineState {
-            get throws {
-                guard let vertexFunction = metalContext.library.makeFunction(name: "textureViewVertex"),
-                      let fragmentFunction = metalContext.library.makeFunction(name: "textureViewFragment") else {
-                    fatalError("Could not load functions for texture view")
-                }
-                
-                let descriptor = MTLRenderPipelineDescriptor()
-                descriptor.vertexFunction = vertexFunction
-                descriptor.fragmentFunction = fragmentFunction
-                descriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
-                
-                return try metalContext.device.makeRenderPipelineState(descriptor: descriptor)
+        private var cachedTextureView: MTLRenderPipelineState?
+        func textureView() throws -> MTLRenderPipelineState {
+            if let cachedTextureView = cachedTextureView { return cachedTextureView }
+            
+            guard let vertexFunction = library.makeFunction(name: "textureViewVertex"),
+                  let fragmentFunction = library.makeFunction(name: "textureViewFragment") else {
+                fatalError("Could not load functions for texture view")
             }
+            
+            let descriptor = MTLRenderPipelineDescriptor()
+            descriptor.vertexFunction = vertexFunction
+            descriptor.fragmentFunction = fragmentFunction
+            descriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+            
+            let textureView = try device.makeRenderPipelineState(descriptor: descriptor)
+            cachedTextureView = textureView
+            return textureView
         }
     }
     

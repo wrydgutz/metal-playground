@@ -24,7 +24,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     
     func pipelineStateObject(metalContext: MetalContext) throws -> MTLComputePipelineState? {
         switch self {
-            case .grayscale: return try metalContext.pipelineStateObjects.grayscale
+            case .grayscale: return try metalContext.pipelineStateObjects.grayscale()
             default: return nil
         }
     }

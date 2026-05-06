@@ -38,15 +38,21 @@ extension MetalTextureView {
     final class Coordinator: NSObject, MTKViewDelegate {
         
         private let metalContext: MetalContext
-        var texture: MTLTexture
+        var texture: MTLTexture {
+            didSet { verticesDirty = true }
+        }
         
         private var vertexBuffer: MTLBuffer
-        private var viewportSize: CGSize = .zero
+        private var viewportSize: CGSize {
+            didSet { verticesDirty = true }
+        }
         
+        private var verticesDirty = true
         
         init(metalContext: MetalContext, texture: MTLTexture) {
             self.metalContext = metalContext
             self.texture = texture
+            self.viewportSize = .zero
             
             // Initialize the vertex buffer.
             let vertices = [MetalContext.TextureViewVertexData].init(
@@ -71,7 +77,7 @@ extension MetalTextureView {
             guard let drawable = view.currentDrawable else { return }
             guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
             
-            updateVertices()
+            updateVerticesIfNeeded()
             
             // Draw into texture, clear it first, keep the result.
             // i.e. Draw once
@@ -107,7 +113,9 @@ extension MetalTextureView {
             commandBuffer.commit()
         }
         
-        private func updateVertices() {
+        private func updateVerticesIfNeeded() {
+            
+            guard verticesDirty else { return }
             
             // Compute for the quad's vertices.
             // The vertices are computed to fit the texture to the viewport.
@@ -130,6 +138,8 @@ extension MetalTextureView {
             let _ = vertices.withUnsafeBytes { raw in
                 memcpy(vertexBuffer.contents(), raw.baseAddress!, length)
             }
+            
+            verticesDirty = false
         }
     }
 }

@@ -77,6 +77,10 @@ extension MetalTextureView {
             guard let drawable = view.currentDrawable else { return }
             guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
             
+            if viewportSize.width == 0 || viewportSize.height == 0 {
+                viewportSize = view.drawableSize
+            }
+            
             updateVerticesIfNeeded()
             
             // Draw into texture, clear it first, keep the result.
@@ -116,6 +120,7 @@ extension MetalTextureView {
         private func updateVerticesIfNeeded() {
             
             guard verticesDirty else { return }
+            guard viewportSize.width > 0, viewportSize.height > 0 else { return }
             
             // Compute for the quad's vertices.
             // The vertices are computed to fit the texture to the viewport.

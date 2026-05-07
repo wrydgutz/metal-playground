@@ -13,18 +13,21 @@ import MetalKit
 enum ImageFilter: CaseIterable, Identifiable {
     case original
     case grayscale
+    case sepia
     
     var id: Self { self }
     var title: String {
         switch self {
             case .original: "Original"
             case .grayscale: "Grayscale"
+            case .sepia: "Sepia"
         }
     }
     
     func pipelineStateObject(metalContext: MetalContext) throws -> MTLComputePipelineState? {
         switch self {
             case .grayscale: return try metalContext.pipelineStateObjects.grayscale()
+            case .sepia: return try metalContext.pipelineStateObjects.sepia()
             default: return nil
         }
     }
@@ -83,7 +86,7 @@ final class ImageFiltersViewModel {
         for name in ImageFilter.allCases {
             if name == .original { continue }
             guard let pipelineStateObject = try name.pipelineStateObject(metalContext: metalContext) else { continue }
-            process(filter: .grayscale, pipelineState: pipelineStateObject)
+            process(filter: name, pipelineState: pipelineStateObject)
         }
     }
     

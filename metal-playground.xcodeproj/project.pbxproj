@@ -16,6 +16,7 @@
 		9E0A14CD2FAA5D8B00113BC4 /* MetalContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0A14CC2FAA5D8800113BC4 /* MetalContext.swift */; };
 		9E6B4BFC2FAA9F7E0007EFA7 /* MetalTextureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6B4BFB2FAA9F7E0007EFA7 /* MetalTextureView.swift */; };
 		9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E82B6A12FAC8C45003795FD /* UVTransform.swift */; };
+		9E82B6A42FAC93C8003795FD /* Sepia.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E82B6A32FAC93C8003795FD /* Sepia.metal */; };
 		9EC7D2422FAB3219008606B8 /* TextureView.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EC7D2412FAB3219008606B8 /* TextureView.metal */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,7 @@
 		9E0A14CC2FAA5D8800113BC4 /* MetalContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalContext.swift; sourceTree = "<group>"; };
 		9E6B4BFB2FAA9F7E0007EFA7 /* MetalTextureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalTextureView.swift; sourceTree = "<group>"; };
 		9E82B6A12FAC8C45003795FD /* UVTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UVTransform.swift; sourceTree = "<group>"; };
+		9E82B6A32FAC93C8003795FD /* Sepia.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Sepia.metal; sourceTree = "<group>"; };
 		9EC7D2412FAB3219008606B8 /* TextureView.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TextureView.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -78,6 +80,7 @@
 			children = (
 				9E0618552FAA0DF900264A1D /* Grayscale.metal */,
 				9EC7D2412FAB3219008606B8 /* TextureView.metal */,
+				9E82B6A32FAC93C8003795FD /* Sepia.metal */,
 			);
 			path = Shaders;
 			sourceTree = "<group>";
@@ -189,6 +192,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E82B6A42FAC93C8003795FD /* Sepia.metal in Sources */,
 				9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */,
 				9E0618562FAA0DF900264A1D /* Grayscale.metal in Sources */,
 				9E0A14CD2FAA5D8B00113BC4 /* MetalContext.swift in Sources */,

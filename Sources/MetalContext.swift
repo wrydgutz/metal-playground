@@ -51,29 +51,29 @@ extension MetalContext {
         // MARK: Compute Pipelines
         private var cachedGrayscale: MTLComputePipelineState?
         func grayscale() throws -> MTLComputePipelineState {
-            if let cachedGrayscale = cachedGrayscale { return cachedGrayscale }
-            
-            guard let function = library.makeFunction(name: "grayscale") else {
-                fatalError("Could not load function 'grayscale'")
-            }
-            
-            let grayscale = try device.makeComputePipelineState(function: function)
-            cachedGrayscale = grayscale
-            return grayscale
+            try computePSO(cached: &cachedGrayscale, name: "grayscale")
         }
         
         private var cachedSepia: MTLComputePipelineState?
         func sepia() throws -> MTLComputePipelineState {
-            if let cachedSepia = cachedSepia { return cachedSepia }
+            try computePSO(cached: &cachedSepia, name: "sepia")
+        }
+        
+        private func computePSO(
+            cached: inout MTLComputePipelineState?,
+            name: String
+        ) throws -> MTLComputePipelineState {
+            if let cached = cached { return cached }
             
-            guard let function = library.makeFunction(name: "sepia") else {
-                fatalError("Could not load function 'sepia'")
+            guard let function = library.makeFunction(name: name) else {
+                fatalError("Could not load function '\(name)'")
             }
             
-            let sepia = try device.makeComputePipelineState(function: function)
-            cachedSepia = sepia
-            return sepia
+            let pso = try device.makeComputePipelineState(function: function)
+            cached = pso
+            return pso
         }
+        
         
         // MARK: Render Pipelines
         private var cachedTextureView: MTLRenderPipelineState?

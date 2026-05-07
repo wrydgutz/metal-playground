@@ -35,6 +35,8 @@ final class ImageFiltersViewModel {
     
     var filter = ImageFilter.original
     var isProcessed = false
+    var textureMapping = TextureMapping.identity
+    
     @ObservationIgnored var filters = [ImageFilter:MTLTexture]()
     @ObservationIgnored var metalContext = MetalContext()
     
@@ -43,6 +45,7 @@ final class ImageFiltersViewModel {
         
         isProcessed = false
         filter = .original
+        textureMapping = image.imageOrientation.textureMapping
         
         let loader = MTKTextureLoader(device: metalContext.device)
         

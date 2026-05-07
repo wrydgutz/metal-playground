@@ -19,7 +19,9 @@ struct ImageFiltersView: View {
             VStack {
                 if viewModel.isProcessed && !viewModel.filters.isEmpty {
                     if let texture = viewModel.filters[viewModel.filter] {
-                        MetalTextureView(metalContext: viewModel.metalContext, texture: texture)
+                        MetalTextureView(metalContext: viewModel.metalContext,
+                                         texture: texture,
+                                         mapping: viewModel.textureMapping)
                             .scaledToFit()
                     }
                 }
@@ -41,7 +43,9 @@ struct ImageFiltersView: View {
                                     Text(filter.title)
                                         .font(.caption)
                                         .foregroundStyle(.black)
-                                    MetalTextureView(metalContext: viewModel.metalContext, texture: texture)
+                                    MetalTextureView(metalContext: viewModel.metalContext,
+                                                     texture: texture,
+                                                     mapping: viewModel.textureMapping)
                                 }
                             }
                             .frame(width: 100, height: 100)

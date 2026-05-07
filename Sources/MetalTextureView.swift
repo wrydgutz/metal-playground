@@ -12,9 +12,10 @@ struct MetalTextureView: UIViewRepresentable {
     
     let metalContext: MetalContext
     let texture: MTLTexture
+    let mapping: TextureMapping
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(metalContext: metalContext, texture: texture)
+        Coordinator(metalContext: metalContext, texture: texture, mapping: mapping)
     }
     
     func makeUIView(context: Context) -> MTKView {
@@ -30,6 +31,7 @@ struct MetalTextureView: UIViewRepresentable {
     
     func updateUIView(_ uiView: MTKView, context: Context) {
         context.coordinator.texture = texture
+        context.coordinator.mapping = mapping
         uiView.setNeedsDisplay()
     }
 }
@@ -42,6 +44,9 @@ extension MetalTextureView {
         var texture: MTLTexture {
             didSet { verticesDirty = true }
         }
+        var mapping: TextureMapping {
+            didSet { verticesDirty = true }
+        }
         
         private var vertexBuffer: MTLBuffer
         private var viewportSize: CGSize {
@@ -50,9 +55,10 @@ extension MetalTextureView {
         
         private var verticesDirty = true
         
-        init(metalContext: MetalContext, texture: MTLTexture) {
+        init(metalContext: MetalContext, texture: MTLTexture, mapping: TextureMapping) {
             self.metalContext = metalContext
             self.texture = texture
+            self.mapping = mapping
             self.viewportSize = .zero
             
             // Initialize the vertex buffer.
@@ -131,13 +137,13 @@ extension MetalTextureView {
             let halfExtents: (Float, Float) = (Float(quadSize.width) * 0.5, Float(quadSize.height) * 0.5)
             
             let vertices: [MetalContext.TextureViewVertexData] = [
-                .init(positionPixels: [halfExtents.0, -halfExtents.1], textureCoordinate: [1.0, 1.0]),
-                .init(positionPixels: [-halfExtents.0, -halfExtents.1], textureCoordinate: [0.0, 1.0]),
-                .init(positionPixels: [-halfExtents.0, halfExtents.1], textureCoordinate: [0.0, 0.0]),
+                .init(positionPixels: [halfExtents.0, -halfExtents.1], textureCoordinate: mapping.apply([1.0, 1.0])),
+                .init(positionPixels: [-halfExtents.0, -halfExtents.1], textureCoordinate: mapping.apply([0.0, 1.0])),
+                .init(positionPixels: [-halfExtents.0, halfExtents.1], textureCoordinate: mapping.apply([0.0, 0.0])),
 
-                .init(positionPixels: [halfExtents.0, -halfExtents.1], textureCoordinate: [1.0, 1.0]),
-                .init(positionPixels: [-halfExtents.0, halfExtents.1], textureCoordinate: [0.0, 0.0]),
-                .init(positionPixels: [halfExtents.0, halfExtents.1], textureCoordinate: [1.0, 0.0])
+                .init(positionPixels: [halfExtents.0, -halfExtents.1], textureCoordinate: mapping.apply([1.0, 1.0])),
+                .init(positionPixels: [-halfExtents.0, halfExtents.1], textureCoordinate: mapping.apply([0.0, 0.0])),
+                .init(positionPixels: [halfExtents.0, halfExtents.1], textureCoordinate: mapping.apply([1.0, 0.0]))
             ]
             
             let length = vertices.count * MemoryLayout<MetalContext.TextureViewVertexData>.stride
@@ -183,5 +189,5 @@ extension MetalTextureView {
         return texture
     }()
     
-    MetalTextureView(metalContext: metalContext, texture: texture)
+    MetalTextureView(metalContext: metalContext, texture: texture, mapping: .identity)
 }

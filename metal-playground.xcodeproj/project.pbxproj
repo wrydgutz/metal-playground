@@ -12,11 +12,10 @@
 		9E06181A2FA9DDFF00264A1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9E0618192FA9DDFF00264A1D /* Assets.xcassets */; };
 		9E0618502FA9DFB700264A1D /* ImageFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E06184F2FA9DFB700264A1D /* ImageFiltersView.swift */; };
 		9E0618542FAA01D500264A1D /* ImageFiltersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0618532FAA01D000264A1D /* ImageFiltersViewModel.swift */; };
-		9E0618562FAA0DF900264A1D /* Grayscale.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E0618552FAA0DF900264A1D /* Grayscale.metal */; };
 		9E0A14CD2FAA5D8B00113BC4 /* MetalContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0A14CC2FAA5D8800113BC4 /* MetalContext.swift */; };
 		9E6B4BFC2FAA9F7E0007EFA7 /* MetalTextureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6B4BFB2FAA9F7E0007EFA7 /* MetalTextureView.swift */; };
 		9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E82B6A12FAC8C45003795FD /* UVTransform.swift */; };
-		9E82B6A42FAC93C8003795FD /* Sepia.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E82B6A32FAC93C8003795FD /* Sepia.metal */; };
+		9E9BDE862FADDBD4009FE503 /* ImageFilters.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E9BDE852FADDBD4009FE503 /* ImageFilters.metal */; };
 		9EC7D2422FAB3219008606B8 /* TextureView.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EC7D2412FAB3219008606B8 /* TextureView.metal */; };
 /* End PBXBuildFile section */
 
@@ -27,11 +26,10 @@
 		9E0618192FA9DDFF00264A1D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9E06184F2FA9DFB700264A1D /* ImageFiltersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFiltersView.swift; sourceTree = "<group>"; };
 		9E0618532FAA01D000264A1D /* ImageFiltersViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFiltersViewModel.swift; sourceTree = "<group>"; };
-		9E0618552FAA0DF900264A1D /* Grayscale.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Grayscale.metal; sourceTree = "<group>"; };
 		9E0A14CC2FAA5D8800113BC4 /* MetalContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalContext.swift; sourceTree = "<group>"; };
 		9E6B4BFB2FAA9F7E0007EFA7 /* MetalTextureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalTextureView.swift; sourceTree = "<group>"; };
 		9E82B6A12FAC8C45003795FD /* UVTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UVTransform.swift; sourceTree = "<group>"; };
-		9E82B6A32FAC93C8003795FD /* Sepia.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Sepia.metal; sourceTree = "<group>"; };
+		9E9BDE852FADDBD4009FE503 /* ImageFilters.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ImageFilters.metal; sourceTree = "<group>"; };
 		9EC7D2412FAB3219008606B8 /* TextureView.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TextureView.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -78,9 +76,8 @@
 		9E25482D2FABDB0F007818BB /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
-				9E0618552FAA0DF900264A1D /* Grayscale.metal */,
 				9EC7D2412FAB3219008606B8 /* TextureView.metal */,
-				9E82B6A32FAC93C8003795FD /* Sepia.metal */,
+				9E9BDE852FADDBD4009FE503 /* ImageFilters.metal */,
 			);
 			path = Shaders;
 			sourceTree = "<group>";
@@ -192,9 +189,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9E82B6A42FAC93C8003795FD /* Sepia.metal in Sources */,
 				9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */,
-				9E0618562FAA0DF900264A1D /* Grayscale.metal in Sources */,
 				9E0A14CD2FAA5D8B00113BC4 /* MetalContext.swift in Sources */,
 				9E0618182FA9DDFF00264A1D /* ContentView.swift in Sources */,
 				9E0618162FA9DDFF00264A1D /* MetalPlaygroundApp.swift in Sources */,
@@ -202,6 +197,7 @@
 				9E0618542FAA01D500264A1D /* ImageFiltersViewModel.swift in Sources */,
 				9EC7D2422FAB3219008606B8 /* TextureView.metal in Sources */,
 				9E0618502FA9DFB700264A1D /* ImageFiltersView.swift in Sources */,
+				9E9BDE862FADDBD4009FE503 /* ImageFilters.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

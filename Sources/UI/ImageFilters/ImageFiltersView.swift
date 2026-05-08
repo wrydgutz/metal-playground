@@ -32,27 +32,36 @@ struct ImageFiltersView: View {
             
             Spacer()
             
-            HStack {
-                if viewModel.isProcessed && !viewModel.filters.isEmpty {
-                    ForEach(ImageFilter.allCases) { filter in
-                        if let texture = viewModel.filters[filter] {
-                            Button {
-                                viewModel.filter = filter
-                            } label: {
-                                VStack {
-                                    Text(filter.title)
-                                        .font(.caption)
-                                        .foregroundStyle(.black)
-                                    MetalTextureView(metalContext: viewModel.metalContext,
-                                                     texture: texture,
-                                                     mapping: viewModel.textureMapping)
+            GeometryReader { proxy in
+                let itemWidth: CGFloat = 100
+                let sideInset = max(0, (proxy.size.width - itemWidth) / 2)
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack {
+                        if viewModel.isProcessed && !viewModel.filters.isEmpty {
+                            ForEach(ImageFilter.allCases) { filter in
+                                if let texture = viewModel.filters[filter] {
+                                    Button {
+                                        viewModel.filter = filter
+                                    } label: {
+                                        VStack {
+                                            Text(filter.title)
+                                                .font(.caption)
+                                                .foregroundStyle(.black)
+                                            MetalTextureView(metalContext: viewModel.metalContext,
+                                                             texture: texture,
+                                                             mapping: viewModel.textureMapping)
+                                        }
+                                    }
+                                    .frame(width: itemWidth, height: 100)
                                 }
                             }
-                            .frame(width: 100, height: 100)
                         }
                     }
+                    .padding(.horizontal, sideInset)
                 }
             }
+            .frame(height: 110)
         }
         .navigationTitle("Image Filters")
         .onChange(of: selectedItem) { _, newItem in

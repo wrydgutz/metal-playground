@@ -59,6 +59,11 @@ extension MetalContext {
             try computePSO(cached: &cachedSepia, name: "sepia")
         }
         
+        private var cachedInvert: MTLComputePipelineState?
+        func invert() throws -> MTLComputePipelineState {
+            try computePSO(cached: &cachedInvert, name: "invert")
+        }
+        
         private func computePSO(
             cached: inout MTLComputePipelineState?,
             name: String

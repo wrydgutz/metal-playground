@@ -14,6 +14,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case original
     case grayscale
     case sepia
+    case invert
     
     var id: Self { self }
     var title: String {
@@ -21,6 +22,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .original: "Original"
             case .grayscale: "Grayscale"
             case .sepia: "Sepia"
+            case .invert: "Invert"
         }
     }
     
@@ -28,6 +30,7 @@ enum ImageFilter: CaseIterable, Identifiable {
         switch self {
             case .grayscale: return try metalContext.pipelineStateObjects.grayscale()
             case .sepia: return try metalContext.pipelineStateObjects.sepia()
+            case .invert: return try metalContext.pipelineStateObjects.invert()
             default: return nil
         }
     }

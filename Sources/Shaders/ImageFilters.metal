@@ -43,3 +43,19 @@ kernel void sepia(texture2d<half, access::read> inputTexture [[texture(0)]],
     
     outputTexture.write(half4(out, colorValue.a), gid);
 }
+
+// MARK: - Invert Compute Kernel
+kernel void invert(texture2d<half, access::read> inputTexture [[texture(0)]],
+                   texture2d<half, access::write> outputTexture [[texture(1)]],
+                   uint2 gid [[thread_position_in_grid]]) {
+
+    // Guard against out-of-bounds writes.
+    if (gid.x >= outputTexture.get_width() ||
+        gid.y >= outputTexture.get_height()) {
+        return;
+    }
+    
+    half4 colorValue = inputTexture.read(gid);
+    half3 out = 1 - colorValue.rgb;
+    outputTexture.write(half4(out, colorValue.a), gid);
+}

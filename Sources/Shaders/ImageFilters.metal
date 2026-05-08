@@ -8,16 +8,20 @@
 #include <metal_stdlib>
 using namespace metal;
 
+// Guard against out-of-bounds writes.
+template <class T, access A>
+bool isOutOfBounds(thread const texture2d<T, A>& outputTexture, uint2 gid) {
+    return gid.x >= outputTexture.get_width() ||
+           gid.y >= outputTexture.get_height();
+}
+
+
 // MARK: - Grayscale Compute Kernel
 kernel void grayscale(texture2d<half, access::read> inputTexture [[texture(0)]],
                       texture2d<half, access::write> outputTexture [[texture(1)]],
                       uint2 gid [[thread_position_in_grid]]) {
 
-    // Guard against out-of-bounds writes.
-    if (gid.x >= outputTexture.get_width() ||
-        gid.y >= outputTexture.get_height()) {
-        return;
-    }
+    if (isOutOfBounds(outputTexture, gid)) return;
     
     half4 colorValue = inputTexture.read(gid);
     half gray = dot(colorValue.rgb, half3(0.299f, 0.587f, 0.114f)); // Rec.601
@@ -29,11 +33,7 @@ kernel void sepia(texture2d<half, access::read> inputTexture [[texture(0)]],
                   texture2d<half, access::write> outputTexture [[texture(1)]],
                   uint2 gid [[thread_position_in_grid]]) {
 
-    // Guard against out-of-bounds writes.
-    if (gid.x >= outputTexture.get_width() ||
-        gid.y >= outputTexture.get_height()) {
-        return;
-    }
+    if (isOutOfBounds(outputTexture, gid)) return;
     
     half4 colorValue = inputTexture.read(gid);
     half dotR = dot(colorValue.rgb, half3(0.393, 0.769, 0.189));
@@ -49,11 +49,7 @@ kernel void invert(texture2d<half, access::read> inputTexture [[texture(0)]],
                    texture2d<half, access::write> outputTexture [[texture(1)]],
                    uint2 gid [[thread_position_in_grid]]) {
 
-    // Guard against out-of-bounds writes.
-    if (gid.x >= outputTexture.get_width() ||
-        gid.y >= outputTexture.get_height()) {
-        return;
-    }
+    if (isOutOfBounds(outputTexture, gid)) return;
     
     half4 colorValue = inputTexture.read(gid);
     half3 out = 1 - colorValue.rgb;

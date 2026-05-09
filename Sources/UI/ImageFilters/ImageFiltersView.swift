@@ -66,7 +66,8 @@ struct ImageFiltersView: View {
             .frame(height: 110)
             
             if viewModel.filter == .brightness {
-                BrightnessSettingsView() { newValue in
+                let config = viewModel.filterConfigs[.brightness] as! BrightnessConfig
+                BrightnessSettingsView(value: config.value) { newValue in
                     do {
                         try viewModel.process(filter: .brightness) { config in
                             let brightnessConfig = config as! BrightnessConfig

@@ -61,9 +61,8 @@ final class ImageFiltersViewModel {
     var textureMapping = TextureMapping.identity
     
     @ObservationIgnored var filters = [ImageFilter:MTLTexture]()
+    @ObservationIgnored var filterConfigs = [ImageFilter:ImageFilterConfig]()
     @ObservationIgnored var metalContext = MetalContext()
-    
-    private var filterConfigs = [ImageFilter:ImageFilterConfig]()
     
     init() {
         filterConfigs[.brightness] = BrightnessConfig()

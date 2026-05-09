@@ -68,3 +68,17 @@ kernel void brightness(texture2d<half, access::read> inputTexture [[texture(0)]]
     half3 out = saturate(colorValue.rgb + half3(brightness));
     outputTexture.write(half4(out, colorValue.a), gid);
 }
+
+// MARK: - Contrast Compute Kernel
+kernel void contrast(texture2d<half, access::read> inputTexture [[texture(0)]],
+                     texture2d<half, access::write> outputTexture [[texture(1)]],
+                     uint2 gid [[thread_position_in_grid]],
+                     constant float& contrast [[buffer(0)]]) {
+
+    if (isOutOfBounds(outputTexture, gid)) return;
+    
+    half4 colorValue = inputTexture.read(gid);
+    half3 pointFive = half3(0.5);
+    half3 out = saturate(((colorValue.rgb - pointFive) * contrast) + pointFive);
+    outputTexture.write(half4(out, colorValue.a), gid);
+}

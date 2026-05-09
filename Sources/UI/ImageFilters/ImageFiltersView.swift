@@ -78,6 +78,19 @@ struct ImageFiltersView: View {
                     }
                 }
                 .padding()
+            } else if viewModel.filter == .contrast {
+                let config = viewModel.filterConfigs[.contrast] as! ContrastConfig
+                ContrastSettingsView(value: config.value) { newValue in
+                    do {
+                        try viewModel.process(filter: .contrast) { config in
+                            let contrastConfig = config as! ContrastConfig
+                            contrastConfig.value = newValue
+                        }
+                    } catch {
+                        print("Error: \(error.localizedDescription)")
+                    }
+                }
+                .padding()
             }
         }
         .navigationTitle("Image Filters")

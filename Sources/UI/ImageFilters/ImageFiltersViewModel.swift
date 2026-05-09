@@ -16,6 +16,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case sepia
     case invert
     case brightness
+    case contrast
     
     var id: Self { self }
     var title: String {
@@ -25,6 +26,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .sepia: "Sepia"
             case .invert: "Invert"
             case .brightness: "Brightness"
+            case .contrast: "Contrast"
         }
     }
     
@@ -34,6 +36,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .sepia: return try metalContext.pipelineStateObjects.sepia()
             case .invert: return try metalContext.pipelineStateObjects.invert()
             case .brightness: return try metalContext.pipelineStateObjects.brightness()
+            case .contrast: return try metalContext.pipelineStateObjects.contrast()
             default: return nil
         }
     }
@@ -44,6 +47,14 @@ protocol ImageFilterConfig {
 }
 
 final class BrightnessConfig: ImageFilterConfig {
+    var value: Float = 0.5
+    
+    func encode(into encoder: inout MTLComputeCommandEncoder) {
+        encoder.setBytes(&value, length: MemoryLayout<Float>.size, index: 0)
+    }
+}
+
+final class ContrastConfig: ImageFilterConfig {
     var value: Float = 0.5
     
     func encode(into encoder: inout MTLComputeCommandEncoder) {
@@ -66,6 +77,7 @@ final class ImageFiltersViewModel {
     
     init() {
         filterConfigs[.brightness] = BrightnessConfig()
+        filterConfigs[.contrast] = ContrastConfig()
     }
     
     func select(filter: ImageFilter) {

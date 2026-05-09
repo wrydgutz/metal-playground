@@ -76,6 +76,7 @@ struct ImageFiltersView: View {
                         print("Error: \(error.localizedDescription)")
                     }
                 }
+                .padding()
             }
         }
         .navigationTitle("Image Filters")

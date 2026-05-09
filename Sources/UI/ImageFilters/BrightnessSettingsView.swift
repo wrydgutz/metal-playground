@@ -13,7 +13,10 @@ struct BrightnessSettingsView: View {
     var onUpdate: (Float) -> Void
     
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
+            Text("Brightness Settings")
+                .font(.title3)
+            
             Slider(value: $value, in: 0.0...1.0) {
                 Text("Brightness")
             } minimumValueLabel: {

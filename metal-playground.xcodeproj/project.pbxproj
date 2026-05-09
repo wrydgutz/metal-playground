@@ -18,6 +18,7 @@
 		9E9BDE862FADDBD4009FE503 /* ImageFilters.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E9BDE852FADDBD4009FE503 /* ImageFilters.metal */; };
 		9EA1B9862FAF48CD00D41199 /* BrightnessSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B9852FAF48CD00D41199 /* BrightnessSettingsView.swift */; };
 		9EA1B9882FAF63DC00D41199 /* ContrastSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B9872FAF63DC00D41199 /* ContrastSettingsView.swift */; };
+		9EA1B98B2FAF647800D41199 /* MTLTexture+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */; };
 		9EC7D2422FAB3219008606B8 /* TextureView.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EC7D2412FAB3219008606B8 /* TextureView.metal */; };
 /* End PBXBuildFile section */
 
@@ -34,6 +35,7 @@
 		9E9BDE852FADDBD4009FE503 /* ImageFilters.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ImageFilters.metal; sourceTree = "<group>"; };
 		9EA1B9852FAF48CD00D41199 /* BrightnessSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessSettingsView.swift; sourceTree = "<group>"; };
 		9EA1B9872FAF63DC00D41199 /* ContrastSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrastSettingsView.swift; sourceTree = "<group>"; };
+		9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLTexture+Extensions.swift"; sourceTree = "<group>"; };
 		9EC7D2412FAB3219008606B8 /* TextureView.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TextureView.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -68,6 +70,7 @@
 		9E25482C2FABDAF6007818BB /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				9EA1B9892FAF646900D41199 /* Extensions */,
 				9E82B6A02FAC8BF2003795FD /* Math */,
 				9E25482F2FABDB83007818BB /* UI */,
 				9E0A14CC2FAA5D8800113BC4 /* MetalContext.swift */,
@@ -121,6 +124,14 @@
 				9E82B6A12FAC8C45003795FD /* UVTransform.swift */,
 			);
 			path = Math;
+			sourceTree = "<group>";
+		};
+		9EA1B9892FAF646900D41199 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -206,6 +217,7 @@
 				9EC7D2422FAB3219008606B8 /* TextureView.metal in Sources */,
 				9E0618502FA9DFB700264A1D /* ImageFiltersView.swift in Sources */,
 				9E9BDE862FADDBD4009FE503 /* ImageFilters.metal in Sources */,
+				9EA1B98B2FAF647800D41199 /* MTLTexture+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -106,38 +106,6 @@ final class ImageFiltersViewModel {
         isProcessed = true
     }
     
-    func copyTexture(_ src: MTLTexture, device: MTLDevice, queue: MTLCommandQueue) -> MTLTexture? {
-        let desc = MTLTextureDescriptor.texture2DDescriptor(
-            pixelFormat: src.pixelFormat,
-            width: src.width,
-            height: src.height,
-            mipmapped: src.mipmapLevelCount > 1
-        )
-        desc.usage = src.usage.union([.shaderRead, .shaderWrite])
-        desc.storageMode = src.storageMode
-
-        guard let dst = device.makeTexture(descriptor: desc),
-              let cb = queue.makeCommandBuffer(),
-              let blit = cb.makeBlitCommandEncoder() else { return nil }
-
-        blit.copy(
-            from: src,
-            sourceSlice: 0,
-            sourceLevel: 0,
-            sourceOrigin: .init(x: 0, y: 0, z: 0),
-            sourceSize: .init(width: src.width, height: src.height, depth: 1),
-            to: dst,
-            destinationSlice: 0,
-            destinationLevel: 0,
-            destinationOrigin: .init(x: 0, y: 0, z: 0)
-        )
-        blit.endEncoding()
-        cb.commit()
-        cb.waitUntilCompleted()
-        return dst
-    }
-
-    
     func loadFilterTextures(original: MTLTexture) {
         
         let descriptor = MTLTextureDescriptor.texture2DDescriptor(
@@ -149,7 +117,8 @@ final class ImageFiltersViewModel {
         descriptor.usage = [.shaderRead, .shaderWrite]
         descriptor.storageMode = .shared
         
-        filters[.original] = copyTexture(original, device: metalContext.device, queue: metalContext.commandQueue)
+        filters[.original] = original.makeCopy(device: metalContext.device,
+                                               queue: metalContext.commandQueue)
         
         for name in ImageFilter.allCases {
             if name == .original { continue }

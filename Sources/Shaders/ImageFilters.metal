@@ -55,3 +55,16 @@ kernel void invert(texture2d<half, access::read> inputTexture [[texture(0)]],
     half3 out = 1 - colorValue.rgb;
     outputTexture.write(half4(out, colorValue.a), gid);
 }
+
+// MARK: - Brightness Compute Kernel
+kernel void brightness(texture2d<half, access::read> inputTexture [[texture(0)]],
+                       texture2d<half, access::write> outputTexture [[texture(1)]],
+                       uint2 gid [[thread_position_in_grid]],
+                       constant float& brightness [[buffer(0)]]) {
+
+    if (isOutOfBounds(outputTexture, gid)) return;
+    
+    half4 colorValue = inputTexture.read(gid);
+    half3 out = saturate(colorValue.rgb + half3(brightness));
+    outputTexture.write(half4(out, colorValue.a), gid);
+}

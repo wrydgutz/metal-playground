@@ -15,6 +15,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case grayscale
     case sepia
     case invert
+    case brightness
     
     var id: Self { self }
     var title: String {
@@ -23,6 +24,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .grayscale: "Grayscale"
             case .sepia: "Sepia"
             case .invert: "Invert"
+            case .brightness: "Brightness"
         }
     }
     
@@ -31,8 +33,21 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .grayscale: return try metalContext.pipelineStateObjects.grayscale()
             case .sepia: return try metalContext.pipelineStateObjects.sepia()
             case .invert: return try metalContext.pipelineStateObjects.invert()
+            case .brightness: return try metalContext.pipelineStateObjects.brightness()
             default: return nil
         }
+    }
+}
+
+protocol ImageFilterConfig {
+    func encode(into encoder: inout MTLComputeCommandEncoder)
+}
+
+final class BrightnessConfig: ImageFilterConfig {
+    var value: Float = 0.5
+    
+    func encode(into encoder: inout MTLComputeCommandEncoder) {
+        encoder.setBytes(&value, length: MemoryLayout<Float>.size, index: 0)
     }
 }
 
@@ -45,6 +60,12 @@ final class ImageFiltersViewModel {
     
     @ObservationIgnored var filters = [ImageFilter:MTLTexture]()
     @ObservationIgnored var metalContext = MetalContext()
+    
+    private var filterConfigs = [ImageFilter:ImageFilterConfig]()
+    
+    init() {
+        filterConfigs[.brightness] = BrightnessConfig()
+    }
     
     func process(image: UIImage) {
         guard let cgImage = image.cgImage else { return }
@@ -89,22 +110,26 @@ final class ImageFiltersViewModel {
         for name in ImageFilter.allCases {
             if name == .original { continue }
             guard let pipelineStateObject = try name.pipelineStateObject(metalContext: metalContext) else { continue }
-            process(filter: name, pipelineState: pipelineStateObject)
+            process(filter: name, pipelineState: pipelineStateObject) { computeEncoder in
+                guard let config = filterConfigs[name] else { return }
+                config.encode(into: &computeEncoder)
+            }
         }
     }
     
-    func process(filter: ImageFilter, pipelineState: MTLComputePipelineState) {
+    func process(filter: ImageFilter, pipelineState: MTLComputePipelineState, computeEncoderArgs: (inout MTLComputeCommandEncoder) -> Void) {
         
         guard filter != .original else { return }
         guard !filters.isEmpty else { return }
         guard let inputTexture = filters[.original] else { return }
         guard let outputTexture = filters[filter] else { return }
         guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
-        guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
+        guard var computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
         computeEncoder.setComputePipelineState(pipelineState)
         computeEncoder.setTexture(inputTexture, index: 0)
         computeEncoder.setTexture(outputTexture, index: 1)
+        computeEncoderArgs(&computeEncoder)
         
         let threadgroupSize = MTLSize(width: 16, height: 16, depth: 1)
         let threadgroupCount = MTLSize(
@@ -119,5 +144,17 @@ final class ImageFiltersViewModel {
         commandBuffer.commit()
         
         commandBuffer.waitUntilCompleted()
+    }
+    
+    func process(filter: ImageFilter, updateConfig: (ImageFilterConfig) -> Void) throws {
+        
+        guard let config = filterConfigs[filter] else { return }
+        guard let pipelineStateObject = try filter.pipelineStateObject(metalContext: metalContext) else { return }
+        
+        updateConfig(config)
+        
+        process(filter: filter, pipelineState: pipelineStateObject) { computeEncoder in
+            config.encode(into: &computeEncoder)
+        }
     }
 }

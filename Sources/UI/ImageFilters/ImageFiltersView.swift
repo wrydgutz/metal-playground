@@ -62,6 +62,21 @@ struct ImageFiltersView: View {
                 }
             }
             .frame(height: 110)
+            
+            if viewModel.filter == .brightness {
+                BrightnessSettingsView() { newValue in
+                    
+                    do {
+                        try viewModel.process(filter: .brightness) { config in
+                            let brightnessConfig = config as! BrightnessConfig
+                            brightnessConfig.value = newValue
+                        }
+                        print("New Brightness: \(newValue)")
+                    } catch {
+                        print("Error: \(error.localizedDescription)")
+                    }
+                }
+            }
         }
         .navigationTitle("Image Filters")
         .onChange(of: selectedItem) { _, newItem in

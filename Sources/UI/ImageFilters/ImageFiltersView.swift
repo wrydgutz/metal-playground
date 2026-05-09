@@ -65,32 +65,21 @@ struct ImageFiltersView: View {
             }
             .frame(height: 110)
             
-            if viewModel.filter == .brightness {
-                let config = viewModel.filterConfigs[.brightness] as! BrightnessConfig
-                BrightnessSettingsView(value: config.value) { newValue in
-                    do {
-                        try viewModel.process(filter: .brightness) { config in
-                            let brightnessConfig = config as! BrightnessConfig
-                            brightnessConfig.value = newValue
+            ForEach(viewModel.filtersWithFloatConfigs) { filter in
+                if viewModel.filter == filter {
+                    let config = viewModel.filterConfigs[filter] as! FloatConfig
+                    FloatSettingsView(value: config.value, label: "\(filter.title) Settings") { newValue in
+                        do {
+                            try viewModel.process(filter: filter) { config in
+                                let floatConfig = config as! FloatConfig
+                                floatConfig.value = newValue
+                            }
+                        } catch {
+                            print("Error: \(error.localizedDescription)")
                         }
-                    } catch {
-                        print("Error: \(error.localizedDescription)")
                     }
+                    .padding()
                 }
-                .padding()
-            } else if viewModel.filter == .contrast {
-                let config = viewModel.filterConfigs[.contrast] as! ContrastConfig
-                ContrastSettingsView(value: config.value) { newValue in
-                    do {
-                        try viewModel.process(filter: .contrast) { config in
-                            let contrastConfig = config as! ContrastConfig
-                            contrastConfig.value = newValue
-                        }
-                    } catch {
-                        print("Error: \(error.localizedDescription)")
-                    }
-                }
-                .padding()
             }
         }
         .navigationTitle("Image Filters")

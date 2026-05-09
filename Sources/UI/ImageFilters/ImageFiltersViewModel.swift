@@ -42,26 +42,6 @@ enum ImageFilter: CaseIterable, Identifiable {
     }
 }
 
-protocol ImageFilterConfig {
-    func encode(into encoder: inout MTLComputeCommandEncoder)
-}
-
-final class BrightnessConfig: ImageFilterConfig {
-    var value: Float = 0.5
-    
-    func encode(into encoder: inout MTLComputeCommandEncoder) {
-        encoder.setBytes(&value, length: MemoryLayout<Float>.size, index: 0)
-    }
-}
-
-final class ContrastConfig: ImageFilterConfig {
-    var value: Float = 0.5
-    
-    func encode(into encoder: inout MTLComputeCommandEncoder) {
-        encoder.setBytes(&value, length: MemoryLayout<Float>.size, index: 0)
-    }
-}
-
 @Observable
 final class ImageFiltersViewModel {
     
@@ -71,13 +51,16 @@ final class ImageFiltersViewModel {
     var isProcessed = false
     var textureMapping = TextureMapping.identity
     
+    @ObservationIgnored var filtersWithFloatConfigs: [ImageFilter] = [ .brightness, .contrast ]
+    
     @ObservationIgnored var filters = [ImageFilter:MTLTexture]()
     @ObservationIgnored var filterConfigs = [ImageFilter:ImageFilterConfig]()
     @ObservationIgnored var metalContext = MetalContext()
     
     init() {
-        filterConfigs[.brightness] = BrightnessConfig()
-        filterConfigs[.contrast] = ContrastConfig()
+        for filter in filtersWithFloatConfigs {
+            filterConfigs[filter] = FloatConfig()
+        }
     }
     
     func select(filter: ImageFilter) {

@@ -1,5 +1,5 @@
 //
-//  ContrastSettingsView.swift
+//  FloatSettingsView.swift
 //  metal-playground
 //
 //  Created by Wrydrick Gutierrez on 9/5/26.
@@ -7,14 +7,15 @@
 
 import SwiftUI
 
-struct ContrastSettingsView: View {
+struct FloatSettingsView: View {
     
     @State var value: Float = 0.5
+    var label: String
     var onUpdate: (Float) -> Void
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Contrast Settings")
+            Text(label)
                 .font(.title3)
             
             Slider(value: $value, in: 0.0...1.0) {
@@ -32,5 +33,5 @@ struct ContrastSettingsView: View {
 }
 
 #Preview {
-    ContrastSettingsView() { _ in }
+    FloatSettingsView(label: "Float Settings") { _ in }
 }

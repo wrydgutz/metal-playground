@@ -54,7 +54,9 @@ final class BrightnessConfig: ImageFilterConfig {
 @Observable
 final class ImageFiltersViewModel {
     
-    var filter = ImageFilter.original
+    var filter: ImageFilter = .original
+    var displayTexture: MTLTexture?
+    var displayTextureRedrawID: Int = 0
     var isProcessed = false
     var textureMapping = TextureMapping.identity
     
@@ -65,6 +67,11 @@ final class ImageFiltersViewModel {
     
     init() {
         filterConfigs[.brightness] = BrightnessConfig()
+    }
+    
+    func select(filter: ImageFilter) {
+        self.filter = filter
+        displayTexture = filters[filter]
     }
     
     func process(image: UIImage) {
@@ -78,6 +85,7 @@ final class ImageFiltersViewModel {
         
         do {
             let texture = try loader.newTexture(cgImage: cgImage)
+            displayTexture = texture
             loadFilterTextures(original: texture)
             try processFilters()
         } catch {
@@ -86,6 +94,38 @@ final class ImageFiltersViewModel {
         
         isProcessed = true
     }
+    
+    func copyTexture(_ src: MTLTexture, device: MTLDevice, queue: MTLCommandQueue) -> MTLTexture? {
+        let desc = MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: src.pixelFormat,
+            width: src.width,
+            height: src.height,
+            mipmapped: src.mipmapLevelCount > 1
+        )
+        desc.usage = src.usage.union([.shaderRead, .shaderWrite])
+        desc.storageMode = src.storageMode
+
+        guard let dst = device.makeTexture(descriptor: desc),
+              let cb = queue.makeCommandBuffer(),
+              let blit = cb.makeBlitCommandEncoder() else { return nil }
+
+        blit.copy(
+            from: src,
+            sourceSlice: 0,
+            sourceLevel: 0,
+            sourceOrigin: .init(x: 0, y: 0, z: 0),
+            sourceSize: .init(width: src.width, height: src.height, depth: 1),
+            to: dst,
+            destinationSlice: 0,
+            destinationLevel: 0,
+            destinationOrigin: .init(x: 0, y: 0, z: 0)
+        )
+        blit.endEncoding()
+        cb.commit()
+        cb.waitUntilCompleted()
+        return dst
+    }
+
     
     func loadFilterTextures(original: MTLTexture) {
         
@@ -98,7 +138,7 @@ final class ImageFiltersViewModel {
         descriptor.usage = [.shaderRead, .shaderWrite]
         descriptor.storageMode = .shared
         
-        filters[.original] = original
+        filters[.original] = copyTexture(original, device: metalContext.device, queue: metalContext.commandQueue)
         
         for name in ImageFilter.allCases {
             if name == .original { continue }
@@ -110,19 +150,19 @@ final class ImageFiltersViewModel {
         for name in ImageFilter.allCases {
             if name == .original { continue }
             guard let pipelineStateObject = try name.pipelineStateObject(metalContext: metalContext) else { continue }
-            process(filter: name, pipelineState: pipelineStateObject) { computeEncoder in
+            guard let outputTexture = filters[name] else { return }
+            process(filter: name, pipelineState: pipelineStateObject, outputTexture: outputTexture) { computeEncoder in
                 guard let config = filterConfigs[name] else { return }
                 config.encode(into: &computeEncoder)
             }
         }
     }
     
-    func process(filter: ImageFilter, pipelineState: MTLComputePipelineState, computeEncoderArgs: (inout MTLComputeCommandEncoder) -> Void) {
+    func process(filter: ImageFilter, pipelineState: MTLComputePipelineState, outputTexture: MTLTexture, computeEncoderArgs: (inout MTLComputeCommandEncoder) -> Void) {
         
         guard filter != .original else { return }
         guard !filters.isEmpty else { return }
         guard let inputTexture = filters[.original] else { return }
-        guard let outputTexture = filters[filter] else { return }
         guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
         guard var computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
@@ -150,11 +190,14 @@ final class ImageFiltersViewModel {
         
         guard let config = filterConfigs[filter] else { return }
         guard let pipelineStateObject = try filter.pipelineStateObject(metalContext: metalContext) else { return }
+        guard let outputTexture = displayTexture else { return }
         
         updateConfig(config)
         
-        process(filter: filter, pipelineState: pipelineStateObject) { computeEncoder in
+        process(filter: filter, pipelineState: pipelineStateObject, outputTexture: outputTexture) { computeEncoder in
             config.encode(into: &computeEncoder)
         }
+        
+        displayTextureRedrawID += 1
     }
 }

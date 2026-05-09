@@ -18,10 +18,11 @@ struct ImageFiltersView: View {
         VStack {
             VStack {
                 if viewModel.isProcessed && !viewModel.filters.isEmpty {
-                    if let texture = viewModel.filters[viewModel.filter] {
+                    if let texture = viewModel.displayTexture {
                         MetalTextureView(metalContext: viewModel.metalContext,
                                          texture: texture,
-                                         mapping: viewModel.textureMapping)
+                                         mapping: viewModel.textureMapping,
+                                         redrawID: viewModel.displayTextureRedrawID)
                             .scaledToFit()
                     }
                 }
@@ -42,7 +43,7 @@ struct ImageFiltersView: View {
                             ForEach(ImageFilter.allCases) { filter in
                                 if let texture = viewModel.filters[filter] {
                                     Button {
-                                        viewModel.filter = filter
+                                        viewModel.select(filter: filter)
                                     } label: {
                                         VStack {
                                             Text(filter.title)
@@ -50,7 +51,8 @@ struct ImageFiltersView: View {
                                                 .foregroundStyle(.black)
                                             MetalTextureView(metalContext: viewModel.metalContext,
                                                              texture: texture,
-                                                             mapping: viewModel.textureMapping)
+                                                             mapping: viewModel.textureMapping,
+                                                             redrawID: nil)
                                         }
                                     }
                                     .frame(width: itemWidth, height: 100)
@@ -65,13 +67,11 @@ struct ImageFiltersView: View {
             
             if viewModel.filter == .brightness {
                 BrightnessSettingsView() { newValue in
-                    
                     do {
                         try viewModel.process(filter: .brightness) { config in
                             let brightnessConfig = config as! BrightnessConfig
                             brightnessConfig.value = newValue
                         }
-                        print("New Brightness: \(newValue)")
                     } catch {
                         print("Error: \(error.localizedDescription)")
                     }

@@ -13,6 +13,7 @@ struct MetalTextureView: UIViewRepresentable {
     let metalContext: MetalContext
     let texture: MTLTexture
     let mapping: TextureMapping
+    let redrawID: Int?
     
     func makeCoordinator() -> Coordinator {
         Coordinator(metalContext: metalContext, texture: texture, mapping: mapping)
@@ -189,5 +190,5 @@ extension MetalTextureView {
         return texture
     }()
     
-    MetalTextureView(metalContext: metalContext, texture: texture, mapping: .identity)
+    MetalTextureView(metalContext: metalContext, texture: texture, mapping: .identity, redrawID: nil)
 }

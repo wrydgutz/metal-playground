@@ -9,11 +9,9 @@
 using namespace metal;
 
 // Guard against out-of-bounds.
-template <class T, access A, class I>
-bool isOutOfBounds(thread const texture2d<T, A>& texture, I gid) {
-    return gid.x < 0 ||
-           gid.y < 0 ||
-           gid.x >= texture.get_width() ||
+template <class T, access A>
+bool isOutOfBounds(thread const texture2d<T, A>& texture, uint2 gid) {
+    return gid.x >= texture.get_width() ||
            gid.y >= texture.get_height();
 }
 
@@ -114,12 +112,19 @@ kernel void boxBlur(texture2d<half, access::read> inputTexture [[texture(0)]],
     
     half3 colorTotal = half3(0);
     half sampleCount = 0;
-    int rad = radius;
-    for (int i = -rad; i <= rad; i++) {
-        for (int j = -rad; j <= rad; j++) {
-            const int2 pixelPos = int2(int(gid.x) + i, int(gid.y) + j);
-            if (isOutOfBounds(inputTexture, pixelPos)) continue;
-            colorTotal += inputTexture.read(uint2(pixelPos)).rgb;
+    
+    const int radiusInt = (int)radius;
+    const int2 gridIdInt = (int2)gid;
+    
+    for (int i = -radiusInt; i <= radiusInt; i++) {
+        for (int j = -radiusInt; j <= radiusInt; j++) {
+            const int2 pixelPos = gridIdInt + int2(i, j);
+            if (pixelPos.x < 0 || pixelPos.y < 0) continue;
+            
+            const uint2 pixelPosUInt = (uint2)pixelPos;
+            if (isOutOfBounds(inputTexture, pixelPosUInt)) continue;
+            
+            colorTotal += inputTexture.read(pixelPosUInt).rgb;
             sampleCount++;
         }
     }

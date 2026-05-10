@@ -111,24 +111,20 @@ kernel void boxBlur(texture2d<half, access::read> inputTexture [[texture(0)]],
     if (isOutOfBounds(outputTexture, gid)) return;
     
     half3 colorTotal = half3(0);
-    half sampleCount = 0;
+    int sampleCount = 0;
     
     const int radiusInt = (int)radius;
-    const int2 gridIdInt = (int2)gid;
+    const int2 base = (int2)gid;
+    const int2 size = int2((int)inputTexture.get_width() - 1, (int)inputTexture.get_height() - 1);
     
     for (int i = -radiusInt; i <= radiusInt; i++) {
         for (int j = -radiusInt; j <= radiusInt; j++) {
-            const int2 pixelPos = gridIdInt + int2(i, j);
-            if (pixelPos.x < 0 || pixelPos.y < 0) continue;
-            
-            const uint2 pixelPosUInt = (uint2)pixelPos;
-            if (isOutOfBounds(inputTexture, pixelPosUInt)) continue;
-            
-            colorTotal += inputTexture.read(pixelPosUInt).rgb;
+            const int2 pixelPos = clamp(base + int2(i, j), int2(0), size);
+            colorTotal += inputTexture.read((uint2)pixelPos).rgb;
             sampleCount++;
         }
     }
     
-    half3 avg = colorTotal / sampleCount;
+    half3 avg = colorTotal / half(sampleCount);
     outputTexture.write(half4(avg, 1.0), gid);
 }

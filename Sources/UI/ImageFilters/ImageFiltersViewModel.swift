@@ -22,9 +22,12 @@ final class ImageFiltersViewModel {
     @ObservationIgnored var filtersWithFloatConfigs: [ImageFilter] = [ .brightness, .contrast, .threshold ]
     @ObservationIgnored var filtersWithUIntConfigs: [ImageFilter] = [ .boxBlur ]
     
-    @ObservationIgnored var filters = [ImageFilter:MTLTexture]()
+    @ObservationIgnored var filters = [ImageFilter:(preview: MTLTexture?, reprocessBuffer:MTLTexture?)]()
     @ObservationIgnored var filterConfigs = [ImageFilter:ImageFilterConfig]()
     @ObservationIgnored var metalContext = MetalContext()
+    
+    @ObservationIgnored private var reprocessInProgress = false
+    @ObservationIgnored private var pendingConfig: ImageFilterConfig?
     
     init() {
         for filter in filtersWithFloatConfigs {
@@ -42,7 +45,7 @@ final class ImageFiltersViewModel {
     
     func select(filter: ImageFilter) {
         self.filter = filter
-        displayTexture = filters[filter]
+        displayTexture = filters[filter]?.preview
     }
     
     func process(image: UIImage) {
@@ -58,7 +61,7 @@ final class ImageFiltersViewModel {
             let texture = try loader.newTexture(cgImage: cgImage)
             displayTexture = texture
             loadFilterTextures(original: texture)
-            try processFilters()
+            try processFilterPreviews()
         } catch {
             print("Error: \(error.localizedDescription)")
         }
@@ -77,20 +80,21 @@ final class ImageFiltersViewModel {
         descriptor.usage = [.shaderRead, .shaderWrite]
         descriptor.storageMode = .shared
         
-        filters[.original] = original.makeCopy(device: metalContext.device,
-                                               queue: metalContext.commandQueue)
+        filters[.original] = (original.makeCopy(device: metalContext.device, queue: metalContext.commandQueue),
+                              nil)
         
         for name in ImageFilter.allCases {
             if name == .original { continue }
-            filters[name] = metalContext.device.makeTexture(descriptor: descriptor)
+            filters[name] = (metalContext.device.makeTexture(descriptor: descriptor),
+                             metalContext.device.makeTexture(descriptor: descriptor))
         }
     }
     
-    func processFilters() throws {
+    func processFilterPreviews() throws {
         for name in ImageFilter.allCases {
             if name == .original { continue }
             guard let pipelineStateObject = try name.pipelineStateObject(metalContext: metalContext) else { continue }
-            guard let outputTexture = filters[name] else { return }
+            guard let outputTexture = filters[name]?.preview else { continue }
             process(filter: name,
                     pipelineState: pipelineStateObject,
                     outputTexture: outputTexture,
@@ -110,7 +114,7 @@ final class ImageFiltersViewModel {
         
         guard filter != .original else { return }
         guard !filters.isEmpty else { return }
-        guard let inputTexture = filters[.original] else { return }
+        guard let inputTexture = filters[.original]?.preview else { return }
         guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
         guard var computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
@@ -139,22 +143,22 @@ final class ImageFiltersViewModel {
         }
     }
     
-    var reprocessInProgress = false
-    var pendingConfig: ImageFilterConfig?
-    
     func requestReprocess(filter: ImageFilter, config: ImageFilterConfig) throws {
         guard let _ = filterConfigs[filter] else { return }
-        pendingConfig = config
-        try reprocessIfPossible(filter: filter)
+        
+        Task {
+            pendingConfig = config
+            try await reprocessIfPossible(filter: filter)
+        }
     }
     
-    func reprocessIfPossible(filter: ImageFilter) throws {
+    func reprocessIfPossible(filter: ImageFilter) async throws {
         
         guard let _ = filterConfigs[filter] else { return }
         guard !reprocessInProgress else { return }
         guard let config = pendingConfig else { return }
         guard let pipelineStateObject = try filter.pipelineStateObject(metalContext: metalContext) else { return }
-        guard let outputTexture = displayTexture else { return }
+        guard let outputTexture = filters[filter]?.reprocessBuffer else { return }
         
         reprocessInProgress = true
         filterConfigs[filter] = pendingConfig
@@ -168,10 +172,12 @@ final class ImageFiltersViewModel {
         } commandBufferWillCommit: { commandBuffer in
             commandBuffer.addCompletedHandler { _ in
                 Task { @MainActor in
+                    let metalContext = self.metalContext
+                    self.displayTexture = outputTexture.makeCopy(device: metalContext.device, queue: metalContext.commandQueue)
                     self.reprocessInProgress = false
                     self.displayTextureRedrawID += 1
                     do {
-                        try self.reprocessIfPossible(filter: filter)
+                        try await self.reprocessIfPossible(filter: filter)
                     } catch {
                         print("Error: \(error.localizedDescription)")
                     }

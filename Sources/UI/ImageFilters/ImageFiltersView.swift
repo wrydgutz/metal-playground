@@ -41,7 +41,7 @@ struct ImageFiltersView: View {
                     HStack {
                         if viewModel.isProcessed && !viewModel.filters.isEmpty {
                             ForEach(ImageFilter.allCases) { filter in
-                                if let texture = viewModel.filters[filter] {
+                                if let texture = viewModel.filters[filter]?.preview {
                                     Button {
                                         viewModel.select(filter: filter)
                                     } label: {

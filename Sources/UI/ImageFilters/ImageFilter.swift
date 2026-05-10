@@ -14,6 +14,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case invert
     case brightness
     case contrast
+    case threshold
     
     var id: Self { self }
     var title: String {
@@ -24,6 +25,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .invert: "Invert"
             case .brightness: "Brightness"
             case .contrast: "Contrast"
+            case .threshold: "Threshold"
         }
     }
     
@@ -34,6 +36,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .invert: return try metalContext.pipelineStateObjects.invert()
             case .brightness: return try metalContext.pipelineStateObjects.brightness()
             case .contrast: return try metalContext.pipelineStateObjects.contrast()
+            case .threshold: return try metalContext.pipelineStateObjects.threshold()
             default: return nil
         }
     }

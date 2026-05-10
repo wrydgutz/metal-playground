@@ -74,6 +74,11 @@ extension MetalContext {
             try computePSO(cached: &cachedContrast, name: "contrast")
         }
         
+        private var cachedThreshold: MTLComputePipelineState?
+        func threshold() throws -> MTLComputePipelineState {
+            try computePSO(cached: &cachedThreshold, name: "threshold")
+        }
+        
         private func computePSO(
             cached: inout MTLComputePipelineState?,
             name: String

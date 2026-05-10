@@ -15,6 +15,11 @@ bool isOutOfBounds(thread const texture2d<T, A>& outputTexture, uint2 gid) {
            gid.y >= outputTexture.get_height();
 }
 
+template <class T, class T3>
+T luminanceRec601(T3 colorRGB) {
+    return dot(colorRGB, T3(0.299f, 0.587f, 0.114f));
+}
+
 
 // MARK: - Grayscale Compute Kernel
 kernel void grayscale(texture2d<half, access::read> inputTexture [[texture(0)]],
@@ -24,7 +29,7 @@ kernel void grayscale(texture2d<half, access::read> inputTexture [[texture(0)]],
     if (isOutOfBounds(outputTexture, gid)) return;
     
     half4 colorValue = inputTexture.read(gid);
-    half gray = dot(colorValue.rgb, half3(0.299f, 0.587f, 0.114f)); // Rec.601
+    half gray = luminanceRec601<half>(colorValue.rgb);
     outputTexture.write(half4(gray, gray, gray, colorValue.a), gid);
 }
 
@@ -81,4 +86,18 @@ kernel void contrast(texture2d<half, access::read> inputTexture [[texture(0)]],
     half3 pointFive = half3(0.5);
     half3 out = saturate(((colorValue.rgb - pointFive) * contrast) + pointFive);
     outputTexture.write(half4(out, colorValue.a), gid);
+}
+
+// MARK: - Threshold Compute Kernel
+kernel void threshold(texture2d<half, access::read> inputTexture [[texture(0)]],
+                     texture2d<half, access::write> outputTexture [[texture(1)]],
+                     uint2 gid [[thread_position_in_grid]],
+                     constant float& factor [[buffer(0)]]) {
+
+    if (isOutOfBounds(outputTexture, gid)) return;
+    
+    half4 colorValue = inputTexture.read(gid);
+    half gray = luminanceRec601<half>(colorValue.rgb);
+    half color = gray >= factor ? 1.0 : 0.0;
+    outputTexture.write(half4(color, color, color, colorValue.a), gid);
 }

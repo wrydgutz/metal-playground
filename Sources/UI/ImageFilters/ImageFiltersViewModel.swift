@@ -19,7 +19,7 @@ final class ImageFiltersViewModel {
     var isProcessed = false
     var textureMapping = TextureMapping.identity
     
-    @ObservationIgnored var filtersWithFloatConfigs: [ImageFilter] = [ .brightness, .contrast ]
+    @ObservationIgnored var filtersWithFloatConfigs: [ImageFilter] = [ .brightness, .contrast, .threshold ]
     
     @ObservationIgnored var filters = [ImageFilter:MTLTexture]()
     @ObservationIgnored var filterConfigs = [ImageFilter:ImageFilterConfig]()

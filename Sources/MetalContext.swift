@@ -7,15 +7,29 @@
 
 import Metal
 
+enum ComputeKernel: String {
+    case original
+    case grayscale
+    case sepia
+    case invert
+    case brightness
+    case contrast
+    case threshold
+    case boxBlur
+}
+
+enum RenderKernel: String {
+    case textureView
+}
+
 final class MetalContext {
     
     let device: MTLDevice
     let library: MTLLibrary
     let commandQueue: MTLCommandQueue
     
-    lazy var pipelineStateObjects: PipelineStateObjects = {
-        PipelineStateObjects(device: device, library: library)
-    }()
+    private var computePipelineStates = [ComputeKernel:MTLComputePipelineState]()
+    private var renderPipelineStates = [RenderKernel:MTLRenderPipelineState]()
     
     init() {
         guard let device = MTLCreateSystemDefaultDevice() else {
@@ -34,92 +48,42 @@ final class MetalContext {
         self.library = library
         self.commandQueue = commandQueue
     }
+    
+    func computePipelineState(for kernel: ComputeKernel) throws -> MTLComputePipelineState {
+        if let pso = computePipelineStates[kernel] { return pso }
+        
+        guard let function = library.makeFunction(name: kernel.rawValue) else {
+            fatalError("Could not load function '\(kernel.rawValue)'")
+        }
+        
+        let pso = try device.makeComputePipelineState(function: function)
+        computePipelineStates[kernel] = pso
+        return pso
+    }
+    
+    func renderPipelineState(for kernel: RenderKernel) throws -> MTLRenderPipelineState {
+        if let pso = renderPipelineStates[kernel] { return pso }
+        
+        guard let vertexFunction = library.makeFunction(name: "\(kernel.rawValue)Vertex") else {
+            fatalError("Could not vertex function for \(kernel.rawValue)")
+        }
+        
+        guard let fragmentFunction = library.makeFunction(name: "\(kernel.rawValue)Fragment") else {
+            fatalError("Could not fragment function for \(kernel.rawValue)")
+        }
+        
+        let descriptor = MTLRenderPipelineDescriptor()
+        descriptor.vertexFunction = vertexFunction
+        descriptor.fragmentFunction = fragmentFunction
+        descriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+        
+        let pso = try device.makeRenderPipelineState(descriptor: descriptor)
+        renderPipelineStates[kernel] = pso
+        return pso
+    }
 }
 
 extension MetalContext {
-    
-    final class PipelineStateObjects {
-        
-        let device: MTLDevice
-        let library: MTLLibrary
-        
-        init(device: MTLDevice, library: MTLLibrary) {
-            self.device = device
-            self.library = library
-        }
-        
-        // MARK: Compute Pipelines
-        private var cachedGrayscale: MTLComputePipelineState?
-        func grayscale() throws -> MTLComputePipelineState {
-            try computePSO(cached: &cachedGrayscale, name: "grayscale")
-        }
-        
-        private var cachedSepia: MTLComputePipelineState?
-        func sepia() throws -> MTLComputePipelineState {
-            try computePSO(cached: &cachedSepia, name: "sepia")
-        }
-        
-        private var cachedInvert: MTLComputePipelineState?
-        func invert() throws -> MTLComputePipelineState {
-            try computePSO(cached: &cachedInvert, name: "invert")
-        }
-        
-        private var cachedBrightness: MTLComputePipelineState?
-        func brightness() throws -> MTLComputePipelineState {
-            try computePSO(cached: &cachedBrightness, name: "brightness")
-        }
-        
-        private var cachedContrast: MTLComputePipelineState?
-        func contrast() throws -> MTLComputePipelineState {
-            try computePSO(cached: &cachedContrast, name: "contrast")
-        }
-        
-        private var cachedThreshold: MTLComputePipelineState?
-        func threshold() throws -> MTLComputePipelineState {
-            try computePSO(cached: &cachedThreshold, name: "threshold")
-        }
-        
-        private var cachedBoxBlur: MTLComputePipelineState?
-        func boxBlur() throws -> MTLComputePipelineState {
-            try computePSO(cached: &cachedBoxBlur, name: "boxBlur")
-        }
-        
-        private func computePSO(
-            cached: inout MTLComputePipelineState?,
-            name: String
-        ) throws -> MTLComputePipelineState {
-            if let cached = cached { return cached }
-            
-            guard let function = library.makeFunction(name: name) else {
-                fatalError("Could not load function '\(name)'")
-            }
-            
-            let pso = try device.makeComputePipelineState(function: function)
-            cached = pso
-            return pso
-        }
-        
-        
-        // MARK: Render Pipelines
-        private var cachedTextureView: MTLRenderPipelineState?
-        func textureView() throws -> MTLRenderPipelineState {
-            if let cachedTextureView = cachedTextureView { return cachedTextureView }
-            
-            guard let vertexFunction = library.makeFunction(name: "textureViewVertex"),
-                  let fragmentFunction = library.makeFunction(name: "textureViewFragment") else {
-                fatalError("Could not load functions for texture view")
-            }
-            
-            let descriptor = MTLRenderPipelineDescriptor()
-            descriptor.vertexFunction = vertexFunction
-            descriptor.fragmentFunction = fragmentFunction
-            descriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
-            
-            let textureView = try device.makeRenderPipelineState(descriptor: descriptor)
-            cachedTextureView = textureView
-            return textureView
-        }
-    }
     
     /// Mirrors `TextureView.metal`'s `VertexData`.
     struct TextureViewVertexData {

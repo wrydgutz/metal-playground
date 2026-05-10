@@ -104,7 +104,8 @@ extension MetalTextureView {
             }
             
             do {
-                encoder.setRenderPipelineState(try metalContext.pipelineStateObjects.textureView())
+                let textureViewPSO = try metalContext.renderPipelineState(for: .textureView)
+                encoder.setRenderPipelineState(textureViewPSO)
             } catch {
                 print("Error: \(error.localizedDescription)")
             }

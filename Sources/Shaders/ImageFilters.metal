@@ -8,11 +8,13 @@
 #include <metal_stdlib>
 using namespace metal;
 
-// Guard against out-of-bounds writes.
-template <class T, access A>
-bool isOutOfBounds(thread const texture2d<T, A>& outputTexture, uint2 gid) {
-    return gid.x >= outputTexture.get_width() ||
-           gid.y >= outputTexture.get_height();
+// Guard against out-of-bounds.
+template <class T, access A, class I>
+bool isOutOfBounds(thread const texture2d<T, A>& texture, I gid) {
+    return gid.x < 0 ||
+           gid.y < 0 ||
+           gid.x >= texture.get_width() ||
+           gid.y >= texture.get_height();
 }
 
 template <class T, class T3>
@@ -100,4 +102,28 @@ kernel void threshold(texture2d<half, access::read> inputTexture [[texture(0)]],
     half gray = luminanceRec601<half>(colorValue.rgb);
     half color = gray >= factor ? 1.0 : 0.0;
     outputTexture.write(half4(color, color, color, colorValue.a), gid);
+}
+
+// MARK: - Box Blur Compute Kernel
+kernel void boxBlur(texture2d<half, access::read> inputTexture [[texture(0)]],
+                    texture2d<half, access::write> outputTexture [[texture(1)]],
+                    uint2 gid [[thread_position_in_grid]],
+                    constant uint& radius [[buffer(0)]]) {
+    
+    if (isOutOfBounds(outputTexture, gid)) return;
+    
+    half3 colorTotal = half3(0);
+    half sampleCount = 0;
+    int rad = radius;
+    for (int i = -rad; i <= rad; i++) {
+        for (int j = -rad; j <= rad; j++) {
+            const int2 pixelPos = int2(int(gid.x) + i, int(gid.y) + j);
+            if (isOutOfBounds(inputTexture, pixelPos)) continue;
+            colorTotal += inputTexture.read(uint2(pixelPos)).rgb;
+            sampleCount++;
+        }
+    }
+    
+    half3 avg = colorTotal / sampleCount;
+    outputTexture.write(half4(avg, 1.0), gid);
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct FloatSettingsView: View {
     
     @State var value: Float = 0.5
+    var range: ClosedRange<Float> = 0.0...1.0
     var label: String
     var onUpdate: (Float) -> Void
     
@@ -18,12 +19,17 @@ struct FloatSettingsView: View {
             Text(label)
                 .font(.title3)
             
-            Slider(value: $value, in: 0.0...1.0) {
-                Text("Brightness")
-            } minimumValueLabel: {
-                Text("0.0")
-            } maximumValueLabel: {
-                Text("1.0")
+            HStack {
+                Text("Factor")
+                    .padding(.trailing, 50)
+                
+                Slider(value: $value, in: range) {
+                    Text(label)
+                } minimumValueLabel: {
+                    Text(String(format: "%.1f", range.lowerBound))
+                } maximumValueLabel: {
+                    Text(String(format: "%.1f", range.upperBound))
+                }
             }
         }
         .onChange(of: value) { _, newValue in

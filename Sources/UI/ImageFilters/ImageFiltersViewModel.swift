@@ -20,6 +20,7 @@ final class ImageFiltersViewModel {
     var textureMapping = TextureMapping.identity
     
     @ObservationIgnored var filtersWithFloatConfigs: [ImageFilter] = [ .brightness, .contrast, .threshold ]
+    @ObservationIgnored var filtersWithUIntConfigs: [ImageFilter] = [ .boxBlur ]
     
     @ObservationIgnored var filters = [ImageFilter:MTLTexture]()
     @ObservationIgnored var filterConfigs = [ImageFilter:ImageFilterConfig]()
@@ -28,6 +29,14 @@ final class ImageFiltersViewModel {
     init() {
         for filter in filtersWithFloatConfigs {
             filterConfigs[filter] = FloatConfig()
+        }
+        
+        for filter in filtersWithUIntConfigs {
+            if filter == .boxBlur {
+                filterConfigs[filter] = UIntConfig(value: 10, range: 0...20)
+            } else {
+                filterConfigs[filter] = UIntConfig()
+            }
         }
     }
     

@@ -15,6 +15,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case brightness
     case contrast
     case threshold
+    case boxBlur
     
     var id: Self { self }
     var title: String {
@@ -26,6 +27,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .brightness: "Brightness"
             case .contrast: "Contrast"
             case .threshold: "Threshold"
+            case .boxBlur: "Box Blur"
         }
     }
     
@@ -37,6 +39,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .brightness: return try metalContext.pipelineStateObjects.brightness()
             case .contrast: return try metalContext.pipelineStateObjects.contrast()
             case .threshold: return try metalContext.pipelineStateObjects.threshold()
+            case .boxBlur: return try metalContext.pipelineStateObjects.boxBlur()
             default: return nil
         }
     }

@@ -91,14 +91,22 @@ final class ImageFiltersViewModel {
             if name == .original { continue }
             guard let pipelineStateObject = try name.pipelineStateObject(metalContext: metalContext) else { continue }
             guard let outputTexture = filters[name] else { return }
-            process(filter: name, pipelineState: pipelineStateObject, outputTexture: outputTexture) { computeEncoder in
+            process(filter: name,
+                    pipelineState: pipelineStateObject,
+                    outputTexture: outputTexture,
+                    waitUntilCompleted: true) { computeEncoder in
                 guard let config = filterConfigs[name] else { return }
                 config.encode(into: &computeEncoder)
             }
         }
     }
     
-    func process(filter: ImageFilter, pipelineState: MTLComputePipelineState, outputTexture: MTLTexture, computeEncoderArgs: (inout MTLComputeCommandEncoder) -> Void) {
+    func process(filter: ImageFilter,
+                 pipelineState: MTLComputePipelineState,
+                 outputTexture: MTLTexture,
+                 waitUntilCompleted: Bool,
+                 computeEncoderArgs: (inout MTLComputeCommandEncoder) -> Void,
+                 commandBufferWillCommit: ((MTLCommandBuffer) -> Void)? = nil) {
         
         guard filter != .original else { return }
         guard !filters.isEmpty else { return }
@@ -121,23 +129,54 @@ final class ImageFiltersViewModel {
         computeEncoder.dispatchThreadgroups(threadgroupCount, threadsPerThreadgroup: threadgroupSize)
         
         computeEncoder.endEncoding()
+        
+        commandBufferWillCommit?(commandBuffer)
+        
         commandBuffer.commit()
         
-        commandBuffer.waitUntilCompleted()
+        if waitUntilCompleted {
+            commandBuffer.waitUntilCompleted()
+        }
     }
     
-    func process(filter: ImageFilter, updateConfig: (ImageFilterConfig) -> Void) throws {
+    var reprocessInProgress = false
+    var pendingConfig: ImageFilterConfig?
+    
+    func requestReprocess(filter: ImageFilter, config: ImageFilterConfig) throws {
+        guard let _ = filterConfigs[filter] else { return }
+        pendingConfig = config
+        try reprocessIfPossible(filter: filter)
+    }
+    
+    func reprocessIfPossible(filter: ImageFilter) throws {
         
-        guard let config = filterConfigs[filter] else { return }
+        guard let _ = filterConfigs[filter] else { return }
+        guard !reprocessInProgress else { return }
+        guard let config = pendingConfig else { return }
         guard let pipelineStateObject = try filter.pipelineStateObject(metalContext: metalContext) else { return }
         guard let outputTexture = displayTexture else { return }
         
-        updateConfig(config)
+        reprocessInProgress = true
+        filterConfigs[filter] = pendingConfig
+        pendingConfig = nil
         
-        process(filter: filter, pipelineState: pipelineStateObject, outputTexture: outputTexture) { computeEncoder in
+        process(filter: filter,
+                pipelineState: pipelineStateObject,
+                outputTexture: outputTexture,
+                waitUntilCompleted: false) { computeEncoder in
             config.encode(into: &computeEncoder)
+        } commandBufferWillCommit: { commandBuffer in
+            commandBuffer.addCompletedHandler { _ in
+                Task { @MainActor in
+                    self.reprocessInProgress = false
+                    self.displayTextureRedrawID += 1
+                    do {
+                        try self.reprocessIfPossible(filter: filter)
+                    } catch {
+                        print("Error: \(error.localizedDescription)")
+                    }
+                }
+            }
         }
-        
-        displayTextureRedrawID += 1
     }
 }

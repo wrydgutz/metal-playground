@@ -15,16 +15,14 @@ protocol Scalar: BitwiseCopyable, Comparable {}
 extension Float: Scalar {}
 extension UInt: Scalar {}
 
-class ScalarConfig<T>: ImageFilterConfig
-where T: Scalar {
-    var value: T
-    var range: ClosedRange<T>
+protocol ScalarConfig: ImageFilterConfig {
+    associatedtype T: Scalar
     
-    init(value: T,
-         range: ClosedRange<T>) {
-        self.value = value
-        self.range = range
-    }
+    var value: T { get set }
+    var range: ClosedRange<T> { get set }
+}
+
+extension ScalarConfig {
     
     func encode(into encoder: inout MTLComputeCommandEncoder) {
         var value = self.value
@@ -32,18 +30,26 @@ where T: Scalar {
     }
 }
 
-final class FloatConfig: ScalarConfig<Float> {
+struct FloatConfig: ScalarConfig {
     
-    override init(value: Float = 0.5,
-                  range: ClosedRange<Float> = 0.0...1.0) {
-        super.init(value: value, range: range)
+    var value: Float
+    var range: ClosedRange<Float>
+    
+    init(value: Float = 0.5,
+         range: ClosedRange<Float> = 0.0...1.0) {
+        self.value = value
+        self.range = range
     }
 }
 
-final class UIntConfig: ScalarConfig<UInt> {
+struct UIntConfig: ScalarConfig {
     
-    override init(value: UInt = 5,
+    var value: UInt
+    var range: ClosedRange<UInt>
+    
+    init(value: UInt = 5,
                   range: ClosedRange<UInt> = 0...10) {
-        super.init(value: value, range: range)
+        self.value = value
+        self.range = range
     }
 }

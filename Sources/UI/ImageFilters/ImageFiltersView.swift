@@ -67,15 +67,13 @@ struct ImageFiltersView: View {
             
             ForEach(viewModel.filtersWithFloatConfigs) { filter in
                 if viewModel.filter == filter {
-                    let config = viewModel.filterConfigs[filter] as! FloatConfig
+                    var config = viewModel.filterConfigs[filter] as! FloatConfig
                     FloatSettingsView(value: config.value,
                                       range: config.range,
                                       label: "\(filter.title) Settings") { newValue in
                         do {
-                            try viewModel.process(filter: filter) { config in
-                                let floatConfig = config as! FloatConfig
-                                floatConfig.value = newValue
-                            }
+                            config.value = newValue
+                            try viewModel.requestReprocess(filter: filter, config: config)
                         } catch {
                             print("Error: \(error.localizedDescription)")
                         }
@@ -86,15 +84,13 @@ struct ImageFiltersView: View {
             
             ForEach(viewModel.filtersWithUIntConfigs) { filter in
                 if viewModel.filter == filter {
-                    let config = viewModel.filterConfigs[filter] as! UIntConfig
+                    var config = viewModel.filterConfigs[filter] as! UIntConfig
                     FloatSettingsView(value: Float(config.value),
                                       range: Float(config.range.lowerBound)...Float(config.range.upperBound),
                                       label: "\(filter.title) Settings") { newValue in
                         do {
-                            try viewModel.process(filter: filter) { config in
-                                let uint32Config = config as! UIntConfig
-                                uint32Config.value = UInt(newValue)
-                            }
+                            config.value = UInt(newValue)
+                            try viewModel.requestReprocess(filter: filter, config: config)
                         } catch {
                             print("Error: \(error.localizedDescription)")
                         }

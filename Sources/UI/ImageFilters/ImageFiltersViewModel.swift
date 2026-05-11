@@ -93,46 +93,31 @@ final class ImageFiltersViewModel {
     func processFilterPreviews() throws {
         for name in ImageFilter.allCases {
             if name == .original { continue }
-            guard let pipelineStateObject = try name.pipelineStateObject(metalContext: metalContext) else { continue }
             guard let outputTexture = filters[name]?.preview else { continue }
-            process(filter: name,
-                    pipelineState: pipelineStateObject,
-                    outputTexture: outputTexture,
-                    waitUntilCompleted: true) { computeEncoder in
-                guard let config = filterConfigs[name] else { return }
+            try process(filter: name, outputTexture: outputTexture, waitUntilCompleted: true) { computeEncoder in
+                guard let config = self.filterConfigs[name] else { return }
                 config.encode(into: computeEncoder)
             }
         }
     }
     
     func process(filter: ImageFilter,
-                 pipelineState: MTLComputePipelineState,
                  outputTexture: MTLTexture,
                  waitUntilCompleted: Bool,
-                 computeEncoderArgs: (MTLComputeCommandEncoder) -> Void,
-                 completedHandler: ((MTLCommandBuffer) -> Void)? = nil) {
+                 encodeCommands: @escaping (MTLComputeCommandEncoder) -> Void,
+                 completedHandler: ((MTLCommandBuffer) -> Void)? = nil) throws {
         
         guard filter != .original else { return }
         guard !filters.isEmpty else { return }
+        guard let pipelineState = try filter.pipelineStateObject(metalContext: metalContext) else { return }
         guard let inputTexture = filters[.original]?.preview else { return }
         guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
-        guard var computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
-        computeEncoder.setComputePipelineState(pipelineState)
-        computeEncoder.setTexture(inputTexture, index: 0)
-        computeEncoder.setTexture(outputTexture, index: 1)
-        computeEncoderArgs(computeEncoder)
-        
-        let threadgroupSize = MTLSize(width: 16, height: 16, depth: 1)
-        let threadgroupCount = MTLSize(
-            width: (inputTexture.width + threadgroupSize.width - 1) / threadgroupSize.width,
-            height: (inputTexture.height + threadgroupSize.height - 1) / threadgroupSize.height,
-            depth: 1
-        )
-        
-        computeEncoder.dispatchThreadgroups(threadgroupCount, threadsPerThreadgroup: threadgroupSize)
-        
-        computeEncoder.endEncoding()
+        metalContext.encodeTexturePass(pipelineState: pipelineState,
+                                       commandBuffer: commandBuffer,
+                                       inputTexture: inputTexture,
+                                       outputTexture: outputTexture,
+                                       encodeCommands: encodeCommands)
         
         if let completedHandler = completedHandler {
             commandBuffer.addCompletedHandler(completedHandler)
@@ -159,17 +144,13 @@ final class ImageFiltersViewModel {
         guard let _ = filterConfigs[filter] else { return }
         guard !reprocessInProgress else { return }
         guard let config = pendingConfig else { return }
-        guard let pipelineStateObject = try filter.pipelineStateObject(metalContext: metalContext) else { return }
         guard let outputTexture = filters[filter]?.reprocessBuffer else { return }
         
         reprocessInProgress = true
         filterConfigs[filter] = pendingConfig
         pendingConfig = nil
         
-        process(filter: filter,
-                pipelineState: pipelineStateObject,
-                outputTexture: outputTexture,
-                waitUntilCompleted: false) { computeEncoder in
+        try process(filter: filter, outputTexture: outputTexture, waitUntilCompleted: false) { computeEncoder in
             config.encode(into: computeEncoder)
         } completedHandler: { commandBuffer in
             Task { @MainActor in

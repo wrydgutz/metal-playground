@@ -82,11 +82,11 @@ final class MetalContext {
         return pso
     }
     
-    func encodeTexturePass(pipelineState: MTLComputePipelineState,
-                           commandBuffer: MTLCommandBuffer,
-                           inputTexture: MTLTexture,
-                           outputTexture: MTLTexture,
-                           encodeCommands: ((MTLComputeCommandEncoder) -> Void)? = nil) {
+    static func encodeComputePass(pipelineState: MTLComputePipelineState,
+                                  commandBuffer: MTLCommandBuffer,
+                                  inputTexture: MTLTexture,
+                                  outputTexture: MTLTexture,
+                                  encodeCommands: ((MTLComputeCommandEncoder) -> Void)? = nil) {
         
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         

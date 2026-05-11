@@ -113,14 +113,11 @@ final class ImageFiltersViewModel {
         guard let inputTexture = filters[.original]?.preview else { return }
         guard let commandBuffer = metalContext.commandQueue.makeCommandBuffer() else { return }
         
-        for kernel in filter.kernels {
-            let pso = try metalContext.computePipelineState(for: kernel)
-            metalContext.encodeTexturePass(pipelineState: pso,
-                                           commandBuffer: commandBuffer,
-                                           inputTexture: inputTexture,
-                                           outputTexture: outputTexture,
-                                           encodeCommands: encodeCommands)
-        }
+        guard let plan = try filter.makePlan(metalContext: metalContext,
+                                             inputTexture: inputTexture,
+                                             outputTexture: outputTexture,
+                                             encodeCommands: encodeCommands) else { return }
+        plan.encode(to: commandBuffer)
         
         if let completedHandler = completedHandler {
             commandBuffer.addCompletedHandler(completedHandler)

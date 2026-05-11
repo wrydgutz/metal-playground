@@ -43,4 +43,77 @@ enum ImageFilter: CaseIterable, Identifiable {
             default: return []
         }
     }
+
+    func makePlan(metalContext: MetalContext,
+                  inputTexture: MTLTexture,
+                  outputTexture: MTLTexture,
+                  encodeCommands: ((MTLComputeCommandEncoder) -> Void)?
+    ) throws -> ImageFilterPlan? {
+        switch self {
+            default:
+                return try SinglePassPlan(metalContext: metalContext,
+                                          kernels: kernels,
+                                          inputTexture: inputTexture,
+                                          outputTexture: outputTexture,
+                                          encodeCommands: encodeCommands)
+        }
+    }
+}
+
+protocol ImageFilterPlan {
+    
+    var passes: [ImageFilter.PassDescriptor] { get }
+    
+    func encode(to commandBuffer: MTLCommandBuffer)
+}
+
+extension ImageFilterPlan {
+    
+    func encode(to commandBuffer: MTLCommandBuffer) {
+        for pass in passes {
+            MetalContext.encodeComputePass(pipelineState: pass.pipelineState,
+                                           commandBuffer: commandBuffer,
+                                           inputTexture: pass.inputTexture,
+                                           outputTexture: pass.outputTexture,
+                                           encodeCommands: pass.encodeCommands)
+        }
+    }
+}
+
+extension ImageFilter {
+    
+    struct PassDescriptor {
+        var pipelineState: MTLComputePipelineState
+        var inputTexture: MTLTexture
+        var outputTexture: MTLTexture
+        var encodeCommands: ((MTLComputeCommandEncoder) -> Void)?
+    }
+    
+    enum SinglePassPlanError: Error {
+        case moreThanOneKernel
+        case noKernel
+    }
+
+    final class SinglePassPlan: ImageFilterPlan {
+    
+        var passes: [ImageFilter.PassDescriptor]
+        
+        init(metalContext: MetalContext,
+             kernels: [ComputeKernel],
+             inputTexture: MTLTexture,
+             outputTexture: MTLTexture,
+             encodeCommands: ((MTLComputeCommandEncoder) -> Void)?
+        ) throws {
+            guard kernels.count == 1 else { throw SinglePassPlanError.moreThanOneKernel }
+            guard let kernel = kernels.first else { throw SinglePassPlanError.noKernel }
+            
+            let pso = try metalContext.computePipelineState(for: kernel)
+            
+            let pass = PassDescriptor(pipelineState: pso,
+                                      inputTexture: inputTexture,
+                                      outputTexture: outputTexture,
+                                      encodeCommands: encodeCommands)
+            self.passes = [pass]
+        }
+    }
 }

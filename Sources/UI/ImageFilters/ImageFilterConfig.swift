@@ -8,7 +8,7 @@
 import Metal
 
 protocol ImageFilterConfig {
-    func encode(into encoder: inout MTLComputeCommandEncoder)
+    func encode(into encoder: MTLComputeCommandEncoder)
 }
 
 protocol Scalar: BitwiseCopyable, Comparable {}
@@ -24,7 +24,7 @@ protocol ScalarConfig: ImageFilterConfig {
 
 extension ScalarConfig {
     
-    func encode(into encoder: inout MTLComputeCommandEncoder) {
+    func encode(into encoder: MTLComputeCommandEncoder) {
         var value = self.value
         encoder.setBytes(&value, length: MemoryLayout<T>.size, index: 0)
     }

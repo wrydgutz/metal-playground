@@ -100,7 +100,7 @@ final class ImageFiltersViewModel {
                     outputTexture: outputTexture,
                     waitUntilCompleted: true) { computeEncoder in
                 guard let config = filterConfigs[name] else { return }
-                config.encode(into: &computeEncoder)
+                config.encode(into: computeEncoder)
             }
         }
     }
@@ -109,7 +109,7 @@ final class ImageFiltersViewModel {
                  pipelineState: MTLComputePipelineState,
                  outputTexture: MTLTexture,
                  waitUntilCompleted: Bool,
-                 computeEncoderArgs: (inout MTLComputeCommandEncoder) -> Void,
+                 computeEncoderArgs: (MTLComputeCommandEncoder) -> Void,
                  completedHandler: ((MTLCommandBuffer) -> Void)? = nil) {
         
         guard filter != .original else { return }
@@ -121,7 +121,7 @@ final class ImageFiltersViewModel {
         computeEncoder.setComputePipelineState(pipelineState)
         computeEncoder.setTexture(inputTexture, index: 0)
         computeEncoder.setTexture(outputTexture, index: 1)
-        computeEncoderArgs(&computeEncoder)
+        computeEncoderArgs(computeEncoder)
         
         let threadgroupSize = MTLSize(width: 16, height: 16, depth: 1)
         let threadgroupCount = MTLSize(
@@ -170,7 +170,7 @@ final class ImageFiltersViewModel {
                 pipelineState: pipelineStateObject,
                 outputTexture: outputTexture,
                 waitUntilCompleted: false) { computeEncoder in
-            config.encode(into: &computeEncoder)
+            config.encode(into: computeEncoder)
         } completedHandler: { commandBuffer in
             Task { @MainActor in
                 let metalContext = self.metalContext

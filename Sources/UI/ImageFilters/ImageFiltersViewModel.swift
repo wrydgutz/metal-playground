@@ -110,7 +110,7 @@ final class ImageFiltersViewModel {
                  outputTexture: MTLTexture,
                  waitUntilCompleted: Bool,
                  computeEncoderArgs: (inout MTLComputeCommandEncoder) -> Void,
-                 commandBufferWillCommit: ((MTLCommandBuffer) -> Void)? = nil) {
+                 completedHandler: ((MTLCommandBuffer) -> Void)? = nil) {
         
         guard filter != .original else { return }
         guard !filters.isEmpty else { return }
@@ -134,7 +134,9 @@ final class ImageFiltersViewModel {
         
         computeEncoder.endEncoding()
         
-        commandBufferWillCommit?(commandBuffer)
+        if let completedHandler = completedHandler {
+            commandBuffer.addCompletedHandler(completedHandler)
+        }
         
         commandBuffer.commit()
         
@@ -169,18 +171,16 @@ final class ImageFiltersViewModel {
                 outputTexture: outputTexture,
                 waitUntilCompleted: false) { computeEncoder in
             config.encode(into: &computeEncoder)
-        } commandBufferWillCommit: { commandBuffer in
-            commandBuffer.addCompletedHandler { _ in
-                Task { @MainActor in
-                    let metalContext = self.metalContext
-                    self.displayTexture = outputTexture.makeCopy(device: metalContext.device, queue: metalContext.commandQueue)
-                    self.reprocessInProgress = false
-                    self.displayTextureRedrawID += 1
-                    do {
-                        try await self.reprocessIfPossible(filter: filter)
-                    } catch {
-                        print("Error: \(error.localizedDescription)")
-                    }
+        } completedHandler: { commandBuffer in
+            Task { @MainActor in
+                let metalContext = self.metalContext
+                self.displayTexture = outputTexture.makeCopy(device: metalContext.device, queue: metalContext.commandQueue)
+                self.reprocessInProgress = false
+                self.displayTextureRedrawID += 1
+                do {
+                    try await self.reprocessIfPossible(filter: filter)
+                } catch {
+                    print("Error: \(error.localizedDescription)")
                 }
             }
         }

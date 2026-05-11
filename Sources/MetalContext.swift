@@ -81,6 +81,31 @@ final class MetalContext {
         renderPipelineStates[kernel] = pso
         return pso
     }
+    
+    func encodeTexturePass(pipelineState: MTLComputePipelineState,
+                           commandBuffer: MTLCommandBuffer,
+                           inputTexture: MTLTexture,
+                           outputTexture: MTLTexture,
+                           encodeCommands: ((MTLComputeCommandEncoder) -> Void)? = nil) {
+        
+        guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
+        
+        computeEncoder.setComputePipelineState(pipelineState)
+        computeEncoder.setTexture(inputTexture, index: 0)
+        computeEncoder.setTexture(outputTexture, index: 1)
+        encodeCommands?(computeEncoder)
+        
+        let threadgroupSize = MTLSize(width: 16, height: 16, depth: 1)
+        let threadgroupCount = MTLSize(
+            width: (inputTexture.width + threadgroupSize.width - 1) / threadgroupSize.width,
+            height: (inputTexture.height + threadgroupSize.height - 1) / threadgroupSize.height,
+            depth: 1
+        )
+        
+        computeEncoder.dispatchThreadgroups(threadgroupCount, threadsPerThreadgroup: threadgroupSize)
+        
+        computeEncoder.endEncoding()
+    }
 }
 
 extension MetalContext {

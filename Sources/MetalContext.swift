@@ -16,6 +16,8 @@ enum ComputeKernel: String {
     case contrast
     case threshold
     case boxBlur
+    case boxBlurTwoPassHorizontal
+    case boxBlurTwoPassVertical
 }
 
 enum RenderKernel: String {

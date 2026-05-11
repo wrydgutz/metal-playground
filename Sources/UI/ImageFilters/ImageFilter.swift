@@ -16,6 +16,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case contrast
     case threshold
     case boxBlur
+    case boxBlurTwoPass
     
     var id: Self { self }
     var title: String {
@@ -28,6 +29,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .contrast: "Contrast"
             case .threshold: "Threshold"
             case .boxBlur: "Box Blur"
+            case .boxBlurTwoPass: "Box Blur (Two-Pass)"
         }
     }
     
@@ -40,6 +42,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .contrast: return [.contrast]
             case .threshold: return [.threshold]
             case .boxBlur: return [.boxBlur]
+            case .boxBlurTwoPass: return [.boxBlurTwoPassHorizontal, .boxBlurTwoPassVertical]
             default: return []
         }
     }
@@ -50,6 +53,12 @@ enum ImageFilter: CaseIterable, Identifiable {
                   encodeCommands: ((MTLComputeCommandEncoder) -> Void)?
     ) throws -> ImageFilterPlan? {
         switch self {
+            case .boxBlurTwoPass:
+                return try BoxBlurTwoPassPlan(metalContext: metalContext,
+                                              kernels: kernels,
+                                              inputTexture: inputTexture,
+                                              outputTexture: outputTexture,
+                                              encodeCommands: encodeCommands)
             default:
                 return try SinglePassPlan(metalContext: metalContext,
                                           kernels: kernels,
@@ -114,6 +123,41 @@ extension ImageFilter {
                                       outputTexture: outputTexture,
                                       encodeCommands: encodeCommands)
             self.passes = [pass]
+        }
+    }
+    
+    enum BoxBlurTwoPassPlanError: Error {
+        case incorrectKernelCount
+        case failedToCreateTemporaryTexture
+    }
+
+    struct BoxBlurTwoPassPlan: ImageFilterPlan {
+    
+        var passes: [ImageFilter.PassDescriptor]
+        
+        init(metalContext: MetalContext,
+             kernels: [ComputeKernel],
+             inputTexture: MTLTexture,
+             outputTexture: MTLTexture,
+             encodeCommands: ((MTLComputeCommandEncoder) -> Void)?
+        ) throws {
+            guard kernels.count == 2 else { throw BoxBlurTwoPassPlanError.incorrectKernelCount }
+            
+            let horizontalPSO = try metalContext.computePipelineState(for: kernels[0])
+            let verticalPSO = try metalContext.computePipelineState(for: kernels[1])
+            guard let tempTexture = inputTexture.makeEmptyCopy(device: metalContext.device) else { throw BoxBlurTwoPassPlanError.failedToCreateTemporaryTexture }
+            
+            self.passes = [
+                PassDescriptor(pipelineState: horizontalPSO,
+                               inputTexture: inputTexture,
+                               outputTexture: tempTexture,
+                               encodeCommands: encodeCommands),
+                
+                PassDescriptor(pipelineState: verticalPSO,
+                               inputTexture: tempTexture,
+                               outputTexture: outputTexture,
+                               encodeCommands: encodeCommands)
+            ]
         }
     }
 }

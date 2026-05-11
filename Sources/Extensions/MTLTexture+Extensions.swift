@@ -39,4 +39,18 @@ extension MTLTexture {
         cb.waitUntilCompleted()
         return dst
     }
+    
+    func makeEmptyCopy(device: MTLDevice, usage: MTLTextureUsage = [.shaderRead, .shaderWrite]) -> MTLTexture? {
+        
+        let descriptor = MTLTextureDescriptor.texture2DDescriptor(
+            pixelFormat: pixelFormat,
+            width: width,
+            height: height,
+            mipmapped: false
+        )
+        descriptor.usage = usage
+        descriptor.storageMode = storageMode
+        
+        return device.makeTexture(descriptor: descriptor)
+    }
 }

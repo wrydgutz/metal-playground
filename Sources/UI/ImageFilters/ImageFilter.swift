@@ -31,16 +31,16 @@ enum ImageFilter: CaseIterable, Identifiable {
         }
     }
     
-    func pipelineStateObject(metalContext: MetalContext) throws -> MTLComputePipelineState? {
+    var kernels: [ComputeKernel] {
         switch self {
-            case .grayscale: return try metalContext.computePipelineState(for: .grayscale)
-            case .sepia: return try metalContext.computePipelineState(for: .sepia)
-            case .invert: return try metalContext.computePipelineState(for: .invert)
-            case .brightness: return try metalContext.computePipelineState(for: .brightness)
-            case .contrast: return try metalContext.computePipelineState(for: .contrast)
-            case .threshold: return try metalContext.computePipelineState(for: .threshold)
-            case .boxBlur: return try metalContext.computePipelineState(for: .boxBlur)
-            default: return nil
+            case .grayscale: return [.grayscale]
+            case .sepia: return [.sepia]
+            case .invert: return [.invert]
+            case .brightness: return [.brightness]
+            case .contrast: return [.contrast]
+            case .threshold: return [.threshold]
+            case .boxBlur: return [.boxBlur]
+            default: return []
         }
     }
 }

@@ -19,9 +19,6 @@ final class ImageFiltersViewModel {
     var isProcessed = false
     var textureMapping = TextureMapping.identity
     
-    @ObservationIgnored var filtersWithFloatConfigs: [ImageFilter] = [ .brightness, .contrast, .threshold ]
-    @ObservationIgnored var filtersWithUIntConfigs: [ImageFilter] = [ .boxBlur, .boxBlurTwoPass ]
-    
     @ObservationIgnored var filters = [ImageFilter:(preview: MTLTexture?, reprocessBuffer:MTLTexture?)]()
     @ObservationIgnored var filterConfigs = [ImageFilter:ImageFilterConfig]()
     @ObservationIgnored var metalContext = MetalContext()
@@ -30,19 +27,29 @@ final class ImageFiltersViewModel {
     @ObservationIgnored private var pendingConfig: ImageFilterConfig?
     
     init() {
-        for filter in filtersWithFloatConfigs {
-            filterConfigs[filter] = FloatConfig()
-        }
+        initConfigs()
+    }
+    
+    func initConfigs() {
+        filterConfigs[.brightness] = ImageFilterConfig(fields: [
+            ConfigField<Float>.make(name: "Intensity", value: 0.5, range: 0.0...1.0)
+        ])
         
-        for filter in filtersWithUIntConfigs {
-            switch filter {
-                case .boxBlur, .boxBlurTwoPass:
-                    filterConfigs[filter] = UIntConfig(value: 10, range: 0...20)
-                    break
-                default:
-                    filterConfigs[filter] = UIntConfig()
-            }
-        }
+        filterConfigs[.contrast] = ImageFilterConfig(fields: [
+            ConfigField<Float>.make(name: "Factor", value: 0.5, range: 0.0...1.0)
+        ])
+        
+        filterConfigs[.threshold] = ImageFilterConfig(fields: [
+            ConfigField<Float>.make(name: "Factor", value: 0.5, range: 0.0...1.0)
+        ])
+        
+        filterConfigs[.boxBlur] = ImageFilterConfig(fields: [
+            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20)
+        ])
+        
+        filterConfigs[.boxBlurTwoPass] = ImageFilterConfig(fields: [
+            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20)
+        ])
     }
     
     func select(filter: ImageFilter) {

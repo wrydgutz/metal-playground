@@ -65,37 +65,24 @@ struct ImageFiltersView: View {
             }
             .frame(height: 110)
             
-            ForEach(viewModel.filtersWithFloatConfigs) { filter in
+            let filtersWithConfigs = viewModel.filterConfigs.keys.map(\.id)
+            ForEach(filtersWithConfigs) { filter in
                 if viewModel.filter == filter {
-                    var config = viewModel.filterConfigs[filter] as! FloatConfig
-                    FloatSettingsView(value: config.value,
-                                      range: config.range,
-                                      label: "\(filter.title) Settings") { newValue in
-                        do {
-                            config.value = newValue
-                            try viewModel.requestReprocess(filter: filter, config: config)
-                        } catch {
-                            print("Error: \(error.localizedDescription)")
+                    ForEach(viewModel.filterConfigs[filter]!.fields) { field in
+                        ConfigFieldView(value: field.getValue(),
+                                        range: field.getRange(),
+                                        label: field.name) { newValue in
+                            field.setValue(newValue)
+                            
+                            do {
+                                try viewModel.requestReprocess(filter: filter,
+                                                               config: viewModel.filterConfigs[filter]!)
+                            } catch {
+                                print("Error: \(error.localizedDescription)")
+                            }
                         }
+                        .padding(.horizontal)
                     }
-                    .padding()
-                }
-            }
-            
-            ForEach(viewModel.filtersWithUIntConfigs) { filter in
-                if viewModel.filter == filter {
-                    var config = viewModel.filterConfigs[filter] as! UIntConfig
-                    FloatSettingsView(value: Float(config.value),
-                                      range: Float(config.range.lowerBound)...Float(config.range.upperBound),
-                                      label: "\(filter.title) Settings") { newValue in
-                        do {
-                            config.value = UInt(newValue)
-                            try viewModel.requestReprocess(filter: filter, config: config)
-                        } catch {
-                            print("Error: \(error.localizedDescription)")
-                        }
-                    }
-                    .padding()
                 }
             }
         }

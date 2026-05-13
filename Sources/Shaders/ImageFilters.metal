@@ -183,3 +183,43 @@ kernel void boxBlurTwoPassVertical(texture2d<half, access::read> inputTexture [[
     outputTexture.write(half4(avg, 1.0), gid);
 }
 
+// MARK: - Gaussian Blur Compute Kernel
+// Standard implementation of Gaussian Blur.
+kernel void gaussianBlur(texture2d<half, access::read> inputTexture [[texture(0)]],
+                         texture2d<half, access::write> outputTexture [[texture(1)]],
+                         uint2 gid [[thread_position_in_grid]],
+                         constant uint& radius [[buffer(0)]],
+                         constant float& strength [[buffer(1)]]) {
+    
+    if (isOutOfBounds(outputTexture, gid)) return;
+    
+    if (strength <= 0.0f) {
+        half4 color = inputTexture.read(gid);
+        outputTexture.write(color, gid);
+        return;
+    }
+    
+    half3 colorTotal = half3(0);
+    half weightTotal = 0.0f;
+    
+    const int radiusInt = (int)radius;
+    const int2 base = (int2)gid;
+    const int2 size = int2((int)inputTexture.get_width() - 1, (int)inputTexture.get_height() - 1);
+    const half twoSigmaSquared = (2.0f * (strength * strength));
+    
+    for (int i = -radiusInt; i <= radiusInt; i++) {
+        for (int j = -radiusInt; j <= radiusInt; j++) {
+            const int2 offset = int2(i, j);
+            const int2 pixelPos = clamp(base + offset, int2(0), size);
+            
+            const half numerator = (half)((i * i) + (j * j));
+            const half g = exp(-numerator / twoSigmaSquared);
+            
+            colorTotal += inputTexture.read((uint2)pixelPos).rgb * g;
+            weightTotal += g;
+        }
+    }
+    
+    half3 avg = colorTotal / half(weightTotal);
+    outputTexture.write(half4(avg, 1.0), gid);
+}

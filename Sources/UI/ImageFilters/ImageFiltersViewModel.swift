@@ -31,25 +31,20 @@ final class ImageFiltersViewModel {
     }
     
     func initConfigs() {
-        filterConfigs[.brightness] = ImageFilterConfig(fields: [
-            ConfigField<Float>.make(name: "Intensity", value: 0.5, range: 0.0...1.0)
-        ])
+        let oneArgFilters: [ImageFilter] = [.brightness, .contrast, .threshold]
+        for filter in oneArgFilters {
+            filterConfigs[filter] = ImageFilterConfig(fields: [
+                ConfigField<Float>.make(name: "Factor", value: 0.5, range: 0.0...1.0)
+            ])
+            
+        }
         
-        filterConfigs[.contrast] = ImageFilterConfig(fields: [
-            ConfigField<Float>.make(name: "Factor", value: 0.5, range: 0.0...1.0)
-        ])
-        
-        filterConfigs[.threshold] = ImageFilterConfig(fields: [
-            ConfigField<Float>.make(name: "Factor", value: 0.5, range: 0.0...1.0)
-        ])
-        
-        filterConfigs[.boxBlur] = ImageFilterConfig(fields: [
-            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20)
-        ])
-        
-        filterConfigs[.boxBlurTwoPass] = ImageFilterConfig(fields: [
-            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20)
-        ])
+        let boxBlurFilters: [ImageFilter] = [.boxBlur, .boxBlurTwoPass]
+        for filter in boxBlurFilters {
+            filterConfigs[filter] = ImageFilterConfig(fields: [
+                ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20)
+            ])
+        }
         
         let gaussianBlurFilters: [ImageFilter] = [.gaussianBlur, .gaussianBlurTwoPass]
         for filter in gaussianBlurFilters {

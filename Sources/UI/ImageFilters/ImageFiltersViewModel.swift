@@ -30,7 +30,7 @@ final class ImageFiltersViewModel {
         initConfigs()
     }
     
-    func initConfigs() {
+    private func initConfigs() {
         let oneArgFilters: [ImageFilter] = [.brightness, .contrast, .threshold]
         for filter in oneArgFilters {
             filterConfigs[filter] = ImageFilterConfig(fields: [
@@ -81,7 +81,7 @@ final class ImageFiltersViewModel {
         isProcessed = true
     }
     
-    func loadFilterTextures(original: MTLTexture) {
+    private func loadFilterTextures(original: MTLTexture) {
         
         let descriptor = MTLTextureDescriptor.texture2DDescriptor(
             pixelFormat: .bgra8Unorm,
@@ -102,7 +102,7 @@ final class ImageFiltersViewModel {
         }
     }
     
-    func processFilterPreviews() throws {
+    private func processFilterPreviews() throws {
         for name in ImageFilter.allCases {
             if name == .original { continue }
             guard let outputTexture = filters[name]?.preview else { continue }
@@ -113,11 +113,11 @@ final class ImageFiltersViewModel {
         }
     }
     
-    func process(filter: ImageFilter,
-                 outputTexture: MTLTexture,
-                 waitUntilCompleted: Bool,
-                 encodeCommands: @escaping (MTLComputeCommandEncoder) -> Void,
-                 completedHandler: ((MTLCommandBuffer) -> Void)? = nil) throws {
+    private func process(filter: ImageFilter,
+                         outputTexture: MTLTexture,
+                         waitUntilCompleted: Bool,
+                         encodeCommands: @escaping (MTLComputeCommandEncoder) -> Void,
+                         completedHandler: ((MTLCommandBuffer) -> Void)? = nil) throws {
         
         guard filter != .original else { return }
         guard !filters.isEmpty else { return }
@@ -142,8 +142,8 @@ final class ImageFiltersViewModel {
         }
     }
     
-    func requestReprocess(filter: ImageFilter, config: ImageFilterConfig) throws {
-        guard let _ = filterConfigs[filter] else { return }
+    func requestReprocess(filter: ImageFilter) throws {
+        guard let config = filterConfigs[filter] else { return }
         
         Task {
             pendingConfig = config
@@ -151,7 +151,7 @@ final class ImageFiltersViewModel {
         }
     }
     
-    func reprocessIfPossible(filter: ImageFilter) async throws {
+    private func reprocessIfPossible(filter: ImageFilter) async throws {
         
         guard let _ = filterConfigs[filter] else { return }
         guard !reprocessInProgress else { return }

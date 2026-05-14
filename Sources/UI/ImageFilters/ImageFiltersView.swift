@@ -67,16 +67,16 @@ struct ImageFiltersView: View {
             
             let filtersWithConfigs = viewModel.filterConfigs.keys.map(\.id)
             ForEach(filtersWithConfigs) { filter in
-                if viewModel.filter == filter {
-                    ForEach(viewModel.filterConfigs[filter]!.fields) { field in
+                if viewModel.filter == filter,
+                   let fields = viewModel.filterConfigs[filter]?.fields {
+                    ForEach(fields) { field in
                         ConfigFieldView(value: field.getValue(),
                                         range: field.getRange(),
                                         label: field.name) { newValue in
                             field.setValue(newValue)
                             
                             do {
-                                try viewModel.requestReprocess(filter: filter,
-                                                               config: viewModel.filterConfigs[filter]!)
+                                try viewModel.requestReprocess(filter: filter)
                             } catch {
                                 print("Error: \(error.localizedDescription)")
                             }

@@ -51,10 +51,13 @@ final class ImageFiltersViewModel {
             ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20)
         ])
         
-        filterConfigs[.gaussianBlur] = ImageFilterConfig(fields: [
-            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20),
-            ConfigField<Float>.make(name: "Strength", value: 5.0, range: 0...30.0)
-        ])
+        let gaussianBlurFilters: [ImageFilter] = [.gaussianBlur, .gaussianBlurTwoPass]
+        for filter in gaussianBlurFilters {
+            filterConfigs[filter] = ImageFilterConfig(fields: [
+                ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20),
+                ConfigField<Float>.make(name: "Strength", value: 5.0, range: 0...30.0)
+            ])
+        }
     }
     
     func select(filter: ImageFilter) {

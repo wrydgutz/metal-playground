@@ -19,6 +19,8 @@ enum ComputeKernel: String {
     case boxBlurTwoPassHorizontal
     case boxBlurTwoPassVertical
     case gaussianBlur
+    case gaussianBlurTwoPassHorizontal
+    case gaussianBlurTwoPassVertical
 }
 
 enum RenderKernel: String {

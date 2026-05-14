@@ -18,6 +18,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case boxBlur
     case boxBlurTwoPass
     case gaussianBlur
+    case gaussianBlurTwoPass
     
     var id: Self { self }
     var title: String {
@@ -32,6 +33,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .boxBlur: "Box Blur"
             case .boxBlurTwoPass: "Box Blur (Two-Pass)"
             case .gaussianBlur: "Gaussian Blur"
+            case .gaussianBlurTwoPass: "Gaussian Blur (Two Pass)"
         }
     }
     
@@ -46,6 +48,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .boxBlur: return [.boxBlur]
             case .boxBlurTwoPass: return [.boxBlurTwoPassHorizontal, .boxBlurTwoPassVertical]
             case .gaussianBlur: return [.gaussianBlur]
+            case .gaussianBlurTwoPass: return [.gaussianBlurTwoPassHorizontal, .gaussianBlurTwoPassVertical]
             default: return []
         }
     }
@@ -62,6 +65,14 @@ enum ImageFilter: CaseIterable, Identifiable {
                                               inputTexture: inputTexture,
                                               outputTexture: outputTexture,
                                               encodeCommands: encodeCommands)
+                
+            case .gaussianBlurTwoPass:
+                return try GaussianBlurTwoPassPlan(metalContext: metalContext,
+                                                   kernels: kernels,
+                                                   inputTexture: inputTexture,
+                                                   outputTexture: outputTexture,
+                                                   encodeCommands: encodeCommands)
+                
             default:
                 return try SinglePassPlan(metalContext: metalContext,
                                           kernels: kernels,
@@ -163,4 +174,6 @@ extension ImageFilter {
             ]
         }
     }
+    
+    typealias GaussianBlurTwoPassPlan = BoxBlurTwoPassPlan
 }

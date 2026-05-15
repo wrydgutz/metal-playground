@@ -31,7 +31,7 @@ final class ImageFiltersViewModel {
     }
     
     private func initConfigs() {
-        let oneArgFilters: [ImageFilter] = [.brightness, .contrast, .threshold]
+        let oneArgFilters: [ImageFilter] = [.brightness, .contrast, .threshold, .sharpen]
         for filter in oneArgFilters {
             filterConfigs[filter] = ImageFilterConfig(fields: [
                 ConfigField<Float>.make(name: "Factor", value: 0.5, range: 0.0...1.0)

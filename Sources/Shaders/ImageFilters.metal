@@ -298,3 +298,47 @@ kernel void gaussianBlurTwoPassVertical(texture2d<half, access::read> inputTextu
     outputTexture.write(half4(avg, 1.0), gid);
 }
 
+// MARK: - Sharpen Compute Kernel
+// K = [ 0,   -a,    0  ]
+//     [ -a, 1 + 4a, -a ]
+//     [ 0,   -a,    0  ]
+half sharpenK(const half strength, const int2 pos) {
+    if (pos.x == 0 && pos.y == 0) return 1.0 + (4.0 * strength);
+    else if ((pos.x == 0 && pos.y == -1) ||
+             (pos.x == 0 && pos.y == 1) ||
+             (pos.x == 1 && pos.y == 0) ||
+             (pos.x == -1 && pos.y == 0)) return -strength;
+    else return 0.0;
+}
+
+// Standard implementation of Sharpen.
+kernel void sharpen(texture2d<half, access::read> inputTexture [[texture(0)]],
+                    texture2d<half, access::write> outputTexture [[texture(1)]],
+                    uint2 gid [[thread_position_in_grid]],
+                    constant float& strength [[buffer(0)]]) {
+    
+    if (isOutOfBounds(outputTexture, gid)) return;
+    
+    if (strength <= 0.0f) {
+        half4 color = inputTexture.read(gid);
+        outputTexture.write(color, gid);
+        return;
+    }
+    
+    half3 colorTotal = half3(0);
+    
+    const half halfTypeStrength = strength;
+    const int2 base = (int2)gid;
+    const int2 size = int2((int)inputTexture.get_width() - 1, (int)inputTexture.get_height() - 1);
+    
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            const int2 offset = int2(i, j);
+            const int2 pixelPos = clamp(base + offset, int2(0), size);
+            colorTotal += inputTexture.read((uint2)pixelPos).rgb * sharpenK(halfTypeStrength, offset);
+        }
+    }
+    
+    const half3 out = saturate(colorTotal);
+    outputTexture.write(half4(out, 1.0), gid);
+}

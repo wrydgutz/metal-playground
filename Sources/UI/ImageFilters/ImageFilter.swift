@@ -19,6 +19,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case boxBlurTwoPass
     case gaussianBlur
     case gaussianBlurTwoPass
+    case sharpen
     
     var id: Self { self }
     var title: String {
@@ -34,6 +35,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .boxBlurTwoPass: "Box Blur (Two-Pass)"
             case .gaussianBlur: "Gaussian Blur"
             case .gaussianBlurTwoPass: "Gaussian Blur (Two Pass)"
+            case .sharpen: "Sharpen"
         }
     }
     
@@ -49,6 +51,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .boxBlurTwoPass: return [.boxBlurTwoPassHorizontal, .boxBlurTwoPassVertical]
             case .gaussianBlur: return [.gaussianBlur]
             case .gaussianBlurTwoPass: return [.gaussianBlurTwoPassHorizontal, .gaussianBlurTwoPassVertical]
+            case .sharpen: return [.sharpen]
             default: return []
         }
     }

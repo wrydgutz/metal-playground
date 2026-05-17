@@ -22,6 +22,7 @@ enum ComputeKernel: String {
     case gaussianBlurTwoPassHorizontal
     case gaussianBlurTwoPassVertical
     case sharpen
+    case sobelEdgeDetection
 }
 
 enum RenderKernel: String {

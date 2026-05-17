@@ -303,10 +303,10 @@ kernel void gaussianBlurTwoPassVertical(texture2d<half, access::read> inputTextu
 //     [ -a, 1 + 4a, -a ]
 //     [ 0,   -a,    0  ]
 template <class T>
-inline T sharpenWeight(const T strength, const int2 offset) {
-    if (offset.x == 0 && offset.y == 0) return 1.0 + (4.0 * strength);
+inline T sharpenKernel(const T strength, const int2 offset) {
+    if (offset.x == 0 && offset.y == 0) return T(1) + (T(4) * strength);
     else if (abs(offset.x) + abs(offset.y) == 1) return -strength;
-    else return 0.0;
+    else return T(0);
 }
 
 // Standard implementation of Sharpen.
@@ -333,7 +333,7 @@ kernel void sharpen(texture2d<half, access::read> inputTexture [[texture(0)]],
         for (int j = -1; j <= 1; j++) {
             const int2 offset = int2(i, j);
             const int2 pixelPos = clamp(base + offset, int2(0), size);
-            colorTotal += inputTexture.read((uint2)pixelPos).rgb * sharpenWeight(halfTypeStrength, offset);
+            colorTotal += inputTexture.read((uint2)pixelPos).rgb * sharpenKernel(halfTypeStrength, offset);
         }
     }
     

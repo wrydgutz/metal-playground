@@ -15,6 +15,10 @@
 		9E0A14CD2FAA5D8B00113BC4 /* MetalContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0A14CC2FAA5D8800113BC4 /* MetalContext.swift */; };
 		9E6B4BFC2FAA9F7E0007EFA7 /* MetalTextureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6B4BFB2FAA9F7E0007EFA7 /* MetalTextureView.swift */; };
 		9E6BEC1F2FB538730083F119 /* ConfigField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6BEC1E2FB538710083F119 /* ConfigField.swift */; };
+		9E7BAD7A2FBB0B7100D9E2DC /* Sobel.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD792FBB0B7100D9E2DC /* Sobel.metal */; };
+		9E7BAD812FBB12F600D9E2DC /* GaussianBlur.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD802FBB12F600D9E2DC /* GaussianBlur.metal */; };
+		9E7BAD842FBB14CE00D9E2DC /* Sharpen.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD832FBB14CE00D9E2DC /* Sharpen.metal */; };
+		9E7BAD872FBB155A00D9E2DC /* BoxBlur.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD862FBB155A00D9E2DC /* BoxBlur.metal */; };
 		9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E82B6A12FAC8C45003795FD /* UVTransform.swift */; };
 		9E9BDE862FADDBD4009FE503 /* ImageFilters.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E9BDE852FADDBD4009FE503 /* ImageFilters.metal */; };
 		9EA1B9862FAF48CD00D41199 /* ConfigFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */; };
@@ -34,6 +38,15 @@
 		9E0A14CC2FAA5D8800113BC4 /* MetalContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalContext.swift; sourceTree = "<group>"; };
 		9E6B4BFB2FAA9F7E0007EFA7 /* MetalTextureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalTextureView.swift; sourceTree = "<group>"; };
 		9E6BEC1E2FB538710083F119 /* ConfigField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigField.swift; sourceTree = "<group>"; };
+		9E7BAD792FBB0B7100D9E2DC /* Sobel.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Sobel.metal; sourceTree = "<group>"; };
+		9E7BAD7B2FBB0B8500D9E2DC /* Helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Helpers.h; sourceTree = "<group>"; };
+		9E7BAD7E2FBB111900D9E2DC /* Sobel.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Sobel.md; sourceTree = "<group>"; };
+		9E7BAD802FBB12F600D9E2DC /* GaussianBlur.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = GaussianBlur.metal; sourceTree = "<group>"; };
+		9E7BAD822FBB136100D9E2DC /* Gaussian Blur.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "Gaussian Blur.md"; sourceTree = "<group>"; };
+		9E7BAD832FBB14CE00D9E2DC /* Sharpen.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Sharpen.metal; sourceTree = "<group>"; };
+		9E7BAD852FBB14F400D9E2DC /* Sharpen.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Sharpen.md; sourceTree = "<group>"; };
+		9E7BAD862FBB155A00D9E2DC /* BoxBlur.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = BoxBlur.metal; sourceTree = "<group>"; };
+		9E7BAD882FBB157E00D9E2DC /* BoxBlur.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = BoxBlur.md; sourceTree = "<group>"; };
 		9E82B6A12FAC8C45003795FD /* UVTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UVTransform.swift; sourceTree = "<group>"; };
 		9E9BDE852FADDBD4009FE503 /* ImageFilters.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = ImageFilters.metal; sourceTree = "<group>"; };
 		9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigFieldView.swift; sourceTree = "<group>"; };
@@ -87,6 +100,8 @@
 		9E25482D2FABDB0F007818BB /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
+				9E7BAD8B2FBB16CE00D9E2DC /* ImageFilters */,
+				9E7BAD7B2FBB0B8500D9E2DC /* Helpers.h */,
 				9EC7D2412FAB3219008606B8 /* TextureView.metal */,
 				9E9BDE852FADDBD4009FE503 /* ImageFilters.metal */,
 			);
@@ -122,6 +137,21 @@
 				9E0618152FA9DDFF00264A1D /* MetalPlaygroundApp.swift */,
 			);
 			path = Main;
+			sourceTree = "<group>";
+		};
+		9E7BAD8B2FBB16CE00D9E2DC /* ImageFilters */ = {
+			isa = PBXGroup;
+			children = (
+				9E7BAD882FBB157E00D9E2DC /* BoxBlur.md */,
+				9E7BAD862FBB155A00D9E2DC /* BoxBlur.metal */,
+				9E7BAD822FBB136100D9E2DC /* Gaussian Blur.md */,
+				9E7BAD802FBB12F600D9E2DC /* GaussianBlur.metal */,
+				9E7BAD852FBB14F400D9E2DC /* Sharpen.md */,
+				9E7BAD832FBB14CE00D9E2DC /* Sharpen.metal */,
+				9E7BAD7E2FBB111900D9E2DC /* Sobel.md */,
+				9E7BAD792FBB0B7100D9E2DC /* Sobel.metal */,
+			);
+			path = ImageFilters;
 			sourceTree = "<group>";
 		};
 		9E82B6A02FAC8BF2003795FD /* Math */ = {
@@ -212,11 +242,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E7BAD7A2FBB0B7100D9E2DC /* Sobel.metal in Sources */,
 				9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */,
 				9EA1B98F2FAF68B000D41199 /* ImageFilter.swift in Sources */,
+				9E7BAD812FBB12F600D9E2DC /* GaussianBlur.metal in Sources */,
+				9E7BAD842FBB14CE00D9E2DC /* Sharpen.metal in Sources */,
 				9E0A14CD2FAA5D8B00113BC4 /* MetalContext.swift in Sources */,
 				9EA1B9862FAF48CD00D41199 /* ConfigFieldView.swift in Sources */,
 				9E0618182FA9DDFF00264A1D /* ContentView.swift in Sources */,
+				9E7BAD872FBB155A00D9E2DC /* BoxBlur.metal in Sources */,
 				9E0618162FA9DDFF00264A1D /* MetalPlaygroundApp.swift in Sources */,
 				9E6B4BFC2FAA9F7E0007EFA7 /* MetalTextureView.swift in Sources */,
 				9E0618542FAA01D500264A1D /* ImageFiltersViewModel.swift in Sources */,

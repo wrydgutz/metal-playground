@@ -2,7 +2,7 @@
 
 Gives an image a warm brown vintage look by remapping its colors using weighted mixes of the original red, green, and blue channels.
 
-For $\mathbf{x} = \begin{bmatrix} r \\ g \\ b \end{bmatrix}$:
+$$\mathbf{x} = \begin{bmatrix} r \\ g \\ b \end{bmatrix}$$
 
 $$
 \mathbf{y} = saturate(A\mathbf{x}, 0, 1),

@@ -25,6 +25,8 @@
 		9E7BAD9A2FBB19FA00D9E2DC /* Invert.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD992FBB19FA00D9E2DC /* Invert.metal */; };
 		9E7BAD9D2FBB1A9000D9E2DC /* Sepia.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD9C2FBB1A9000D9E2DC /* Sepia.metal */; };
 		9E7BADA02FBB1B4F00D9E2DC /* Grayscale.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD9F2FBB1B4F00D9E2DC /* Grayscale.metal */; };
+		9E7BADA32FBB1DA700D9E2DC /* Emboss.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BADA22FBB1DA700D9E2DC /* Emboss.metal */; };
+		9E7BADA52FBB25B100D9E2DC /* Emboss.md in Resources */ = {isa = PBXBuildFile; fileRef = 9E7BADA42FBB25AC00D9E2DC /* Emboss.md */; };
 		9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E82B6A12FAC8C45003795FD /* UVTransform.swift */; };
 		9EA1B9862FAF48CD00D41199 /* ConfigFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */; };
 		9EA1B98B2FAF647800D41199 /* MTLTexture+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */; };
@@ -64,6 +66,8 @@
 		9E7BAD9E2FBB1AC100D9E2DC /* Sepia.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Sepia.md; sourceTree = "<group>"; };
 		9E7BAD9F2FBB1B4F00D9E2DC /* Grayscale.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Grayscale.metal; sourceTree = "<group>"; };
 		9E7BADA12FBB1B7A00D9E2DC /* Grayscale.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Grayscale.md; sourceTree = "<group>"; };
+		9E7BADA22FBB1DA700D9E2DC /* Emboss.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Emboss.metal; sourceTree = "<group>"; };
+		9E7BADA42FBB25AC00D9E2DC /* Emboss.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Emboss.md; sourceTree = "<group>"; };
 		9E82B6A12FAC8C45003795FD /* UVTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UVTransform.swift; sourceTree = "<group>"; };
 		9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigFieldView.swift; sourceTree = "<group>"; };
 		9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLTexture+Extensions.swift"; sourceTree = "<group>"; };
@@ -177,6 +181,8 @@
 				9E7BAD792FBB0B7100D9E2DC /* Sobel.metal */,
 				9E7BAD922FBB188400D9E2DC /* Threshold.md */,
 				9E7BAD902FBB181700D9E2DC /* Threshold.metal */,
+				9E7BADA42FBB25AC00D9E2DC /* Emboss.md */,
+				9E7BADA22FBB1DA700D9E2DC /* Emboss.metal */,
 			);
 			path = ImageFilters;
 			sourceTree = "<group>";
@@ -259,6 +265,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9E06181A2FA9DDFF00264A1D /* Assets.xcassets in Resources */,
+				9E7BADA52FBB25B100D9E2DC /* Emboss.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,6 +282,7 @@
 				9E7BADA02FBB1B4F00D9E2DC /* Grayscale.metal in Sources */,
 				9E7BAD812FBB12F600D9E2DC /* GaussianBlur.metal in Sources */,
 				9E7BAD842FBB14CE00D9E2DC /* Sharpen.metal in Sources */,
+				9E7BADA32FBB1DA700D9E2DC /* Emboss.metal in Sources */,
 				9E0A14CD2FAA5D8B00113BC4 /* MetalContext.swift in Sources */,
 				9EA1B9862FAF48CD00D41199 /* ConfigFieldView.swift in Sources */,
 				9E0618182FA9DDFF00264A1D /* ContentView.swift in Sources */,

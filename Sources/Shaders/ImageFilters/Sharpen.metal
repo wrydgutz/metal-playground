@@ -12,7 +12,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-#include "Helpers.h"
+#include "../Helpers.h"
 
 // K = [ 0,   -a,    0  ]
 //     [ -a, 1 + 4a, -a ]

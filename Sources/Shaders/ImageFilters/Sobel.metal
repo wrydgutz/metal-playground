@@ -15,7 +15,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-#include "Helpers.h"
+#include "../Helpers.h"
 
 // K = [ -1, 0, 1 ]
 //     [ -2, 0, 2 ]

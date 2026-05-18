@@ -13,7 +13,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-#include "Helpers.h"
+#include "../Helpers.h"
 
 // MARK: Compute Kernels
 

@@ -92,27 +92,27 @@ final class MetalContext {
     
     static func encodeComputePass(pipelineState: MTLComputePipelineState,
                                   commandBuffer: MTLCommandBuffer,
-                                  inputTexture: MTLTexture,
-                                  outputTexture: MTLTexture,
-                                  encodeCommands: ((MTLComputeCommandEncoder) -> Void)? = nil) {
+                                  threadgroupsPerGrid: MTLSize,
+                                  threadsPerThreadgroup: MTLSize,
+                                  setArgs: (MTLComputeCommandEncoder) -> Void) {
         
         guard let computeEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
         computeEncoder.setComputePipelineState(pipelineState)
-        computeEncoder.setTexture(inputTexture, index: 0)
-        computeEncoder.setTexture(outputTexture, index: 1)
-        encodeCommands?(computeEncoder)
-        
-        let threadgroupSize = MTLSize(width: 16, height: 16, depth: 1)
-        let threadgroupCount = MTLSize(
-            width: (inputTexture.width + threadgroupSize.width - 1) / threadgroupSize.width,
-            height: (inputTexture.height + threadgroupSize.height - 1) / threadgroupSize.height,
+        setArgs(computeEncoder)
+        computeEncoder.dispatchThreadgroups(threadgroupsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
+        computeEncoder.endEncoding()
+    }
+    
+    static let defaultThreadsPerThreadgroup = MTLSize(width: 16, height: 16, depth: 1)
+    
+    static func threadgroupsPerGridForFullCoverage(inputTexture: MTLTexture,
+                                                   threadsPerThreadgroup: MTLSize = MetalContext.defaultThreadsPerThreadgroup) -> MTLSize {
+        MTLSize(
+            width: (inputTexture.width + threadsPerThreadgroup.width - 1) / threadsPerThreadgroup.width,
+            height: (inputTexture.height + threadsPerThreadgroup.height - 1) / threadsPerThreadgroup.height,
             depth: 1
         )
-        
-        computeEncoder.dispatchThreadgroups(threadgroupCount, threadsPerThreadgroup: threadgroupSize)
-        
-        computeEncoder.endEncoding()
     }
 }
 

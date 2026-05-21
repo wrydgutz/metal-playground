@@ -106,17 +106,17 @@ final class ImageFiltersViewModel {
         for name in ImageFilter.allCases {
             if name == .original { continue }
             guard let outputTexture = filters[name]?.preview else { continue }
-            try process(filter: name, outputTexture: outputTexture, waitUntilCompleted: true) { computeEncoder in
-                guard let config = self.filterConfigs[name] else { return }
-                config.encode(into: computeEncoder)
-            }
+            try process(filter: name,
+                        outputTexture: outputTexture,
+                        config: self.filterConfigs[name],
+                        waitUntilCompleted: true)
         }
     }
     
     private func process(filter: ImageFilter,
                          outputTexture: MTLTexture,
+                         config: ImageFilterConfig?,
                          waitUntilCompleted: Bool,
-                         encodeCommands: @escaping (MTLComputeCommandEncoder) -> Void,
                          completedHandler: ((MTLCommandBuffer) -> Void)? = nil) throws {
         
         guard filter != .original else { return }
@@ -128,7 +128,7 @@ final class ImageFiltersViewModel {
         guard let plan = try filter.makePlan(metalContext: metalContext,
                                              inputTexture: inputTexture,
                                              outputTexture: outputTexture,
-                                             encodeCommands: encodeCommands) else { return }
+                                             config: config) else { return }
         plan.encode(to: commandBuffer)
         
         if let completedHandler = completedHandler {
@@ -162,9 +162,10 @@ final class ImageFiltersViewModel {
         filterConfigs[filter] = pendingConfig
         pendingConfig = nil
         
-        try process(filter: filter, outputTexture: outputTexture, waitUntilCompleted: false) { computeEncoder in
-            config.encode(into: computeEncoder)
-        } completedHandler: { commandBuffer in
+        try process(filter: filter,
+                    outputTexture: outputTexture,
+                    config: config,
+                    waitUntilCompleted: false) { commandBuffer in
             Task { @MainActor in
                 let metalContext = self.metalContext
                 self.displayTexture = outputTexture.makeCopy(device: metalContext.device, queue: metalContext.commandQueue)

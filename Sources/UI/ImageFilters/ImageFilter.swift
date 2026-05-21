@@ -65,7 +65,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     func makePlan(metalContext: MetalContext,
                   inputTexture: MTLTexture,
                   outputTexture: MTLTexture,
-                  encodeCommands: ((MTLComputeCommandEncoder) -> Void)?
+                  config: ImageFilterConfig?
     ) throws -> ImageFilterPlan? {
         switch self {
             case .boxBlurTwoPass:
@@ -73,21 +73,21 @@ enum ImageFilter: CaseIterable, Identifiable {
                                               kernels: kernels,
                                               inputTexture: inputTexture,
                                               outputTexture: outputTexture,
-                                              encodeCommands: encodeCommands)
+                                              config: config)
                 
             case .gaussianBlurTwoPass:
                 return try GaussianBlurTwoPassPlan(metalContext: metalContext,
                                                    kernels: kernels,
                                                    inputTexture: inputTexture,
                                                    outputTexture: outputTexture,
-                                                   encodeCommands: encodeCommands)
+                                                   config: config)
                 
             default:
                 return try SinglePassPlan(metalContext: metalContext,
                                           kernels: kernels,
                                           inputTexture: inputTexture,
                                           outputTexture: outputTexture,
-                                          encodeCommands: encodeCommands)
+                                          config: config)
         }
     }
 }
@@ -105,9 +105,9 @@ extension ImageFilterPlan {
         for pass in passes {
             MetalContext.encodeComputePass(pipelineState: pass.pipelineState,
                                            commandBuffer: commandBuffer,
-                                           inputTexture: pass.inputTexture,
-                                           outputTexture: pass.outputTexture,
-                                           encodeCommands: pass.encodeCommands)
+                                           threadgroupsPerGrid: pass.threadgroupsPerGrid,
+                                           threadsPerThreadgroup: pass.threadsPerThreadgroup,
+                                           setArgs: pass.setArgs)
         }
     }
 }
@@ -116,9 +116,9 @@ extension ImageFilter {
     
     struct PassDescriptor {
         var pipelineState: MTLComputePipelineState
-        var inputTexture: MTLTexture
-        var outputTexture: MTLTexture
-        var encodeCommands: ((MTLComputeCommandEncoder) -> Void)?
+        var threadgroupsPerGrid: MTLSize
+        var threadsPerThreadgroup: MTLSize
+        var setArgs: (MTLComputeCommandEncoder) -> Void
     }
     
     enum SinglePassPlanError: Error {
@@ -134,7 +134,7 @@ extension ImageFilter {
              kernels: [ComputeKernel],
              inputTexture: MTLTexture,
              outputTexture: MTLTexture,
-             encodeCommands: ((MTLComputeCommandEncoder) -> Void)?
+             config: ImageFilterConfig?
         ) throws {
             guard kernels.count == 1 else { throw SinglePassPlanError.moreThanOneKernel }
             guard let kernel = kernels.first else { throw SinglePassPlanError.noKernel }
@@ -142,9 +142,12 @@ extension ImageFilter {
             let pso = try metalContext.computePipelineState(for: kernel)
             
             let pass = PassDescriptor(pipelineState: pso,
-                                      inputTexture: inputTexture,
-                                      outputTexture: outputTexture,
-                                      encodeCommands: encodeCommands)
+                                      threadgroupsPerGrid: MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: inputTexture),
+                                      threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                encoder.setTexture(inputTexture, index: 0)
+                encoder.setTexture(outputTexture, index: 1)
+                config?.encode(into: encoder)
+            }
             self.passes = [pass]
         }
     }
@@ -162,7 +165,7 @@ extension ImageFilter {
              kernels: [ComputeKernel],
              inputTexture: MTLTexture,
              outputTexture: MTLTexture,
-             encodeCommands: ((MTLComputeCommandEncoder) -> Void)?
+             config: ImageFilterConfig?
         ) throws {
             guard kernels.count == 2 else { throw BoxBlurTwoPassPlanError.incorrectKernelCount }
             
@@ -170,16 +173,25 @@ extension ImageFilter {
             let verticalPSO = try metalContext.computePipelineState(for: kernels[1])
             guard let tempTexture = inputTexture.makeEmptyCopy(device: metalContext.device) else { throw BoxBlurTwoPassPlanError.failedToCreateTemporaryTexture }
             
+            let threadgroupsPerGrid = MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: inputTexture)
+            
             self.passes = [
+                
                 PassDescriptor(pipelineState: horizontalPSO,
-                               inputTexture: inputTexture,
-                               outputTexture: tempTexture,
-                               encodeCommands: encodeCommands),
+                               threadgroupsPerGrid: threadgroupsPerGrid,
+                               threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                    encoder.setTexture(inputTexture, index: 0)
+                    encoder.setTexture(tempTexture, index: 1)
+                    config?.encode(into: encoder)
+                },
                 
                 PassDescriptor(pipelineState: verticalPSO,
-                               inputTexture: tempTexture,
-                               outputTexture: outputTexture,
-                               encodeCommands: encodeCommands)
+                               threadgroupsPerGrid: threadgroupsPerGrid,
+                               threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                    encoder.setTexture(tempTexture, index: 0)
+                    encoder.setTexture(outputTexture, index: 1)
+                    config?.encode(into: encoder)
+                }
             ]
         }
     }

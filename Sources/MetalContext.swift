@@ -24,6 +24,8 @@ enum ComputeKernel: String {
     case sharpen
     case sobelEdgeDetection
     case emboss
+    case bloomBright
+    case bloomCombine
 }
 
 enum RenderKernel: String {

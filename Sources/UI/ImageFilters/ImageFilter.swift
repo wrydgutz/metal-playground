@@ -22,6 +22,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case sharpen
     case sobelEdgeDetection
     case emboss
+    case bloom
     
     var id: Self { self }
     var title: String {
@@ -40,6 +41,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .sharpen: "Sharpen"
             case .sobelEdgeDetection: "Sobel Edge Detection"
             case .emboss: "Emboss"
+            case .bloom: "Bloom"
         }
     }
     
@@ -58,6 +60,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .sharpen: return [.sharpen]
             case .sobelEdgeDetection: return [.sobelEdgeDetection]
             case .emboss: return [.emboss]
+            case .bloom: return [.bloomBright, .gaussianBlurTwoPassHorizontal, .gaussianBlurTwoPassVertical, .bloomCombine]
             default: return []
         }
     }
@@ -81,6 +84,13 @@ enum ImageFilter: CaseIterable, Identifiable {
                                                    inputTexture: inputTexture,
                                                    outputTexture: outputTexture,
                                                    config: config)
+                
+            case .bloom:
+                return try BloomPlan(metalContext: metalContext,
+                                     kernels: kernels,
+                                     inputTexture: inputTexture,
+                                     outputTexture: outputTexture,
+                                     config: config)
                 
             default:
                 return try SinglePassPlan(metalContext: metalContext,
@@ -197,4 +207,76 @@ extension ImageFilter {
     }
     
     typealias GaussianBlurTwoPassPlan = BoxBlurTwoPassPlan
+    
+    enum BloomPlanError: Error {
+        case incorrectKernelCount
+        case missingConfig
+        case failedToCreateTemporaryTexture
+    }
+
+    struct BloomPlan: ImageFilterPlan {
+    
+        var passes: [ImageFilter.PassDescriptor]
+        
+        init(metalContext: MetalContext,
+             kernels: [ComputeKernel],
+             inputTexture: MTLTexture,
+             outputTexture: MTLTexture,
+             config: ImageFilterConfig?
+        ) throws {
+            guard kernels.count == ImageFilter.bloom.kernels.count else { throw BloomPlanError.incorrectKernelCount }
+            guard let config = config else { throw BloomPlanError.missingConfig }
+            
+            let brightPSO = try metalContext.computePipelineState(for: kernels[0])
+            let gaussianBlurHorizontalPSO = try metalContext.computePipelineState(for: kernels[1])
+            let gaussianBlurVerticalPSO = try metalContext.computePipelineState(for: kernels[2])
+            let combinePSO = try metalContext.computePipelineState(for: kernels[3])
+            
+            guard let brightOutputTexture = inputTexture.makeEmptyCopy(device: metalContext.device) else { throw BloomPlanError.failedToCreateTemporaryTexture }
+            guard let gaussianBlurHorizontalOutputTexture = inputTexture.makeEmptyCopy(device: metalContext.device) else { throw BloomPlanError.failedToCreateTemporaryTexture }
+            guard let gaussianBlurVerticalOutputTexture = inputTexture.makeEmptyCopy(device: metalContext.device) else { throw BloomPlanError.failedToCreateTemporaryTexture }
+            
+            let threadgroupsPerGrid = MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: inputTexture)
+            
+            var blurRadius: UInt = max(UInt(ceil(3 * config.fields[1].getValue())), 30)
+            
+            self.passes = [
+                
+                PassDescriptor(pipelineState: brightPSO,
+                               threadgroupsPerGrid: threadgroupsPerGrid,
+                               threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                    encoder.setTexture(inputTexture, index: 0)
+                    encoder.setTexture(brightOutputTexture, index: 1)
+                    config.fields[0].encode(into: encoder, index: 0) // Threshold
+                },
+                
+                PassDescriptor(pipelineState: gaussianBlurHorizontalPSO,
+                               threadgroupsPerGrid: threadgroupsPerGrid,
+                               threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                    encoder.setTexture(brightOutputTexture, index: 0)
+                    encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 1)
+                    encoder.setBytes(&blurRadius, length: MemoryLayout<UInt>.size, index: 0)
+                    config.fields[1].encode(into: encoder, index: 1) // Blur Strength
+                },
+                
+                PassDescriptor(pipelineState: gaussianBlurVerticalPSO,
+                               threadgroupsPerGrid: threadgroupsPerGrid,
+                               threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                    encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 0)
+                    encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
+                    encoder.setBytes(&blurRadius, length: MemoryLayout<UInt>.size, index: 0)
+                    config.fields[1].encode(into: encoder, index: 1) // Blur Strength
+                },
+                
+                PassDescriptor(pipelineState: combinePSO,
+                               threadgroupsPerGrid: threadgroupsPerGrid,
+                               threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                    encoder.setTexture(inputTexture, index: 0)
+                    encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
+                    encoder.setTexture(outputTexture, index: 2)
+                    config.fields[2].encode(into: encoder, index: 0) // Intensity
+                }
+            ]
+        }
+    }
 }

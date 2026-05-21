@@ -14,7 +14,13 @@ A multipass effect that creates a soft glow around bright areas by extracting hi
 
 Extract only pixels above a brightness threshold.
 
-$$B(x,y)=\begin{cases}I(x,y),&L(x,y)>T\\0,&\text{otherwise}\end{cases}$$
+$$
+B(x,y)=
+\begin{cases}
+I(x,y), & L(x,y) > T \\
+0, & \text{otherwise}
+\end{cases}
+$$
 
 Where:
 

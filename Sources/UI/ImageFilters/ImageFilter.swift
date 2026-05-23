@@ -242,6 +242,7 @@ extension ImageFilter {
             
             self.passes = [
                 
+                // Bright Pass
                 PassDescriptor(pipelineState: brightPSO,
                                threadgroupsPerGrid: threadgroupsPerGrid,
                                threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
@@ -250,13 +251,14 @@ extension ImageFilter {
                     config.fields[0].encode(into: encoder, index: 0) // Threshold
                 },
                 
+                // Gaussian Blur Passes
                 PassDescriptor(pipelineState: gaussianBlurHorizontalPSO,
                                threadgroupsPerGrid: threadgroupsPerGrid,
                                threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                     encoder.setTexture(brightOutputTexture, index: 0)
                     encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 1)
                     encoder.setBytes(&blurRadius, length: MemoryLayout<UInt>.size, index: 0)
-                    config.fields[1].encode(into: encoder, index: 1) // Blur Strength
+                    config.fields[1].encode(into: encoder, index: 1) // Blur Radius
                 },
                 
                 PassDescriptor(pipelineState: gaussianBlurVerticalPSO,
@@ -265,9 +267,10 @@ extension ImageFilter {
                     encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 0)
                     encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
                     encoder.setBytes(&blurRadius, length: MemoryLayout<UInt>.size, index: 0)
-                    config.fields[1].encode(into: encoder, index: 1) // Blur Strength
+                    config.fields[1].encode(into: encoder, index: 1) // Blur Radius
                 },
                 
+                // Combine Pass
                 PassDescriptor(pipelineState: combinePSO,
                                threadgroupsPerGrid: threadgroupsPerGrid,
                                threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in

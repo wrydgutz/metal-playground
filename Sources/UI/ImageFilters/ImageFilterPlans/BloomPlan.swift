@@ -16,6 +16,7 @@ struct BloomPlan: ImageFilterPlan {
         let kernels = context.kernels
         guard kernels.count == ImageFilter.bloom.kernels.count else { throw PassPlanError.incorrectKernelCount }
         guard let config = context.config else { throw PassPlanError.missingConfig }
+        guard let bloomConfig = config as? BloomConfig else { throw PassPlanError.incorrectConfigType }
         
         let metalContext = context.metalContext
         let inputTexture = context.inputTexture
@@ -35,7 +36,7 @@ struct BloomPlan: ImageFilterPlan {
         else { throw PassPlanError.failedToCreateTemporaryTexture }
         
         let threadgroupsPerGrid = MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: inputTexture)
-        var blurSigma: Float = config.fields[1].getValue() / 3
+        var blurSigma: Float = bloomConfig.radius.getValue() / 3
         
         self.passes = [
             
@@ -45,7 +46,7 @@ struct BloomPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(inputTexture, index: 0)
                 encoder.setTexture(brightOutputTexture, index: 1)
-                config.fields[0].encode(into: encoder, index: 0) // Threshold
+                bloomConfig.threshold.encode(into: encoder, index: 0)
             },
             
             // Gaussian Blur Passes
@@ -54,8 +55,8 @@ struct BloomPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(brightOutputTexture, index: 0)
                 encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 1)
-                config.fields[1].encode(into: encoder, index: 0) // Radius
-                encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)  // Sigma
+                bloomConfig.radius.encode(into: encoder, index: 0)
+                encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)
             },
             
             PassDescriptor(pipelineState: gaussianBlurVerticalPSO,
@@ -63,8 +64,8 @@ struct BloomPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 0)
                 encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
-                config.fields[1].encode(into: encoder, index: 0) // Radius
-                encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)  // Sigma
+                bloomConfig.radius.encode(into: encoder, index: 0) // Radius
+                encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)
             },
             
             // Combine Pass
@@ -74,7 +75,7 @@ struct BloomPlan: ImageFilterPlan {
                 encoder.setTexture(inputTexture, index: 0)
                 encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
                 encoder.setTexture(context.outputTexture, index: 2)
-                config.fields[2].encode(into: encoder, index: 0) // Intensity
+                bloomConfig.intensity.encode(into: encoder, index: 0)
             }
         ]
     }

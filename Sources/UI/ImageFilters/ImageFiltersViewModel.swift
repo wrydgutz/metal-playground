@@ -32,37 +32,21 @@ final class ImageFiltersViewModel {
     private func initConfigs() {
         let oneArgFilters: [ImageFilter] = [.brightness, .contrast, .threshold, .sharpen]
         for filter in oneArgFilters {
-            filterConfigs[filter] = ImageFilterConfig(fields: [
-                ConfigField<Float>.make(name: "Factor", value: 0.5, range: 0.0...1.0)
-            ])
-            
+            filterConfigs[filter] = SingleFieldConfig(name: "Factor", value: 0.5, range: 0.0...1.0)
         }
         
         let boxBlurFilters: [ImageFilter] = [.boxBlur, .boxBlurTwoPass]
         for filter in boxBlurFilters {
-            filterConfigs[filter] = ImageFilterConfig(fields: [
-                ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20)
-            ])
+            filterConfigs[filter] = SingleFieldConfig(name: "Radius", value: UInt(10), range: 0...20)
         }
         
         let gaussianBlurFilters: [ImageFilter] = [.gaussianBlur, .gaussianBlurTwoPass]
         for filter in gaussianBlurFilters {
-            filterConfigs[filter] = ImageFilterConfig(fields: [
-                ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...20),
-                ConfigField<Float>.make(name: "Strength", value: 5.0, range: 0...30.0)
-            ])
+            filterConfigs[filter] = GaussianBlurConfig()
         }
         
-        filterConfigs[.bloom] = ImageFilterConfig(fields: [
-            ConfigField<Float>.make(name: "Threshold", value: 0.5, range: 0.0...1.0),
-            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...30),
-            ConfigField<Float>.make(name: "Intensity", value: 0.5, range: 0.0...1.0)
-        ])
-        
-        filterConfigs[.unsharpMask] = ImageFilterConfig(fields: [
-            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...30),
-            ConfigField<Float>.make(name: "Amount", value: 0.5, range: 0.0...2.0)
-        ])
+        filterConfigs[.bloom] = BloomConfig()
+        filterConfigs[.unsharpMask] = UnsharpMaskConfig()
     }
     
     func select(filter: ImageFilter) {

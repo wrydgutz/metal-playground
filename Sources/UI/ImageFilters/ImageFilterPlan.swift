@@ -48,5 +48,6 @@ struct PassDescriptor {
 enum PassPlanError: Error {
     case incorrectKernelCount
     case missingConfig
+    case incorrectConfigType
     case failedToCreateTemporaryTexture
 }

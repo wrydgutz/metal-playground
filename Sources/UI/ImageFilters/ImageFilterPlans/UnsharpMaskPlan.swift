@@ -16,6 +16,7 @@ struct UnsharpMaskPlan: ImageFilterPlan {
         let kernels = context.kernels
         guard context.kernels.count == ImageFilter.unsharpMask.kernels.count else { throw PassPlanError.incorrectKernelCount }
         guard let config = context.config else { throw PassPlanError.missingConfig }
+        guard let unsharpMaskConfig = config as? UnsharpMaskConfig else { throw PassPlanError.incorrectConfigType }
         
         let metalContext = context.metalContext
         let inputTexture = context.inputTexture
@@ -32,7 +33,7 @@ struct UnsharpMaskPlan: ImageFilterPlan {
         
         let threadgroupsPerGrid = MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: inputTexture)
         
-        var blurSigma: Float = config.fields[0].getValue() / 3
+        var blurSigma: Float = unsharpMaskConfig.radius.getValue() / 3
         
         self.passes = [
             
@@ -42,8 +43,8 @@ struct UnsharpMaskPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(inputTexture, index: 0)
                 encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 1)
-                config.fields[0].encode(into: encoder, index: 0) // Radius
-                encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)  // Sigma
+                unsharpMaskConfig.radius.encode(into: encoder, index: 0)
+                encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)
             },
             
             PassDescriptor(pipelineState: gaussianBlurVerticalPSO,
@@ -51,8 +52,8 @@ struct UnsharpMaskPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 0)
                 encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
-                config.fields[0].encode(into: encoder, index: 0) // Radius
-                encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)  // Sigma
+                unsharpMaskConfig.radius.encode(into: encoder, index: 0)
+                encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)
             },
             
             // Combine Pass
@@ -62,7 +63,7 @@ struct UnsharpMaskPlan: ImageFilterPlan {
                 encoder.setTexture(inputTexture, index: 0)
                 encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
                 encoder.setTexture(context.outputTexture, index: 2)
-                config.fields[1].encode(into: encoder, index: 0) // Amount
+                unsharpMaskConfig.amount.encode(into: encoder, index: 0)
             }
         ]
     }

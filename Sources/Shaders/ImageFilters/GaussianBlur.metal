@@ -23,11 +23,11 @@ kernel void gaussianBlur(texture2d<half, access::read> inputTexture [[texture(0)
                          texture2d<half, access::write> outputTexture [[texture(1)]],
                          uint2 gid [[thread_position_in_grid]],
                          constant uint& radius [[buffer(0)]],
-                         constant float& strength [[buffer(1)]]) {
+                         constant float& sigma [[buffer(1)]]) {
     
     if (isOutOfBounds(outputTexture, gid)) return;
     
-    if (strength <= 0.0f) {
+    if (sigma <= 0.0f) {
         half4 color = inputTexture.read(gid);
         outputTexture.write(color, gid);
         return;
@@ -39,7 +39,7 @@ kernel void gaussianBlur(texture2d<half, access::read> inputTexture [[texture(0)
     const int radiusInt = (int)radius;
     const int2 base = (int2)gid;
     const int2 size = int2((int)inputTexture.get_width() - 1, (int)inputTexture.get_height() - 1);
-    const half twoSigmaSquared = (2.0f * (strength * strength));
+    const half twoSigmaSquared = (2.0f * (sigma * sigma));
     
     for (int i = -radiusInt; i <= radiusInt; i++) {
         for (int j = -radiusInt; j <= radiusInt; j++) {
@@ -67,11 +67,11 @@ kernel void gaussianBlurTwoPassHorizontal(texture2d<half, access::read> inputTex
                                           texture2d<half, access::write> outputTexture [[texture(1)]],
                                           uint2 gid [[thread_position_in_grid]],
                                           constant uint& radius [[buffer(0)]],
-                                          constant float& strength [[buffer(1)]]) {
+                                          constant float& sigma [[buffer(1)]]) {
     
     if (isOutOfBounds(outputTexture, gid)) return;
     
-    if (strength <= 0.0f) {
+    if (sigma <= 0.0f) {
         half4 color = inputTexture.read(gid);
         outputTexture.write(color, gid);
         return;
@@ -83,7 +83,7 @@ kernel void gaussianBlurTwoPassHorizontal(texture2d<half, access::read> inputTex
     const int radiusInt = (int)radius;
     const int baseX = (int)gid.x;
     const int width = (int)inputTexture.get_width() - 1;
-    const half twoSigmaSquared = (2.0f * (strength * strength));
+    const half twoSigmaSquared = (2.0f * (sigma * sigma));
     
     for (int x = -radiusInt; x <= radiusInt; x++) {
         const uint2 pixelPos = uint2(clamp(baseX + x, 0, width), gid.y);
@@ -102,11 +102,11 @@ kernel void gaussianBlurTwoPassVertical(texture2d<half, access::read> inputTextu
                                         texture2d<half, access::write> outputTexture [[texture(1)]],
                                         uint2 gid [[thread_position_in_grid]],
                                         constant uint& radius [[buffer(0)]],
-                                        constant float& strength [[buffer(1)]]) {
+                                        constant float& sigma [[buffer(1)]]) {
     
     if (isOutOfBounds(outputTexture, gid)) return;
     
-    if (strength <= 0.0f) {
+    if (sigma <= 0.0f) {
         half4 color = inputTexture.read(gid);
         outputTexture.write(color, gid);
         return;
@@ -118,7 +118,7 @@ kernel void gaussianBlurTwoPassVertical(texture2d<half, access::read> inputTextu
     const int radiusInt = (int)radius;
     const int baseY = (int)gid.y;
     const int height = (int)inputTexture.get_height() - 1;
-    const half twoSigmaSquared = (2.0f * (strength * strength));
+    const half twoSigmaSquared = (2.0f * (sigma * sigma));
     
     for (int y = -radiusInt; y <= radiusInt; y++) {
         const uint2 pixelPos = uint2(gid.x, clamp(baseY + y, 0, height));

@@ -56,7 +56,7 @@ final class ImageFiltersViewModel {
         
         filterConfigs[.bloom] = ImageFilterConfig(fields: [
             ConfigField<Float>.make(name: "Threshold", value: 0.5, range: 0.0...1.0),
-            ConfigField<Float>.make(name: "Blur Strength", value: 5.0, range: 0...10.0),
+            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...30),
             ConfigField<Float>.make(name: "Intensity", value: 0.5, range: 0.0...1.0)
         ])
     }

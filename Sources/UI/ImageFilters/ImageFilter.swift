@@ -238,7 +238,7 @@ extension ImageFilter {
             
             let threadgroupsPerGrid = MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: inputTexture)
             
-            var blurRadius: UInt = max(UInt(ceil(3 * config.fields[1].getValue())), 30)
+            var blurSigma: Float = config.fields[1].getValue() / 3
             
             self.passes = [
                 
@@ -257,8 +257,8 @@ extension ImageFilter {
                                threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                     encoder.setTexture(brightOutputTexture, index: 0)
                     encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 1)
-                    encoder.setBytes(&blurRadius, length: MemoryLayout<UInt>.size, index: 0)
-                    config.fields[1].encode(into: encoder, index: 1) // Blur Radius
+                    config.fields[1].encode(into: encoder, index: 0) // Radius
+                    encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)  // Sigma
                 },
                 
                 PassDescriptor(pipelineState: gaussianBlurVerticalPSO,
@@ -266,8 +266,8 @@ extension ImageFilter {
                                threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                     encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 0)
                     encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
-                    encoder.setBytes(&blurRadius, length: MemoryLayout<UInt>.size, index: 0)
-                    config.fields[1].encode(into: encoder, index: 1) // Blur Radius
+                    config.fields[1].encode(into: encoder, index: 0) // Radius
+                    encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)  // Sigma
                 },
                 
                 // Combine Pass

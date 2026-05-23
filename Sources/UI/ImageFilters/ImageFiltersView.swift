@@ -90,8 +90,8 @@ struct ImageFiltersView: View {
         .onChange(of: selectedItem) { _, newItem in
             Task {
                 if let data = try? await newItem?.loadTransferable(type: Data.self),
-                   let uiImage = UIImage(data: data) {
-                    viewModel.process(image: uiImage)
+                   let image = PlatformImage(data: data) {
+                    viewModel.process(image: image)
                 }
             }
         }

@@ -5,7 +5,6 @@
 //  Created by Wrydrick Gutierrez on 5/5/26.
 //
 
-import UIKit
 import Observation
 import Metal
 import MetalKit
@@ -66,12 +65,12 @@ final class ImageFiltersViewModel {
         displayTexture = filters[filter]?.preview
     }
     
-    func process(image: UIImage) {
-        guard let cgImage = image.cgImage else { return }
+    func process(image: PlatformImage) {
+        guard let cgImage = image.cgImageForProcessing else { return }
         
         isProcessed = false
         filter = .original
-        textureMapping = image.imageOrientation.textureMapping
+        textureMapping = image.textureMappingForDisplay
         
         let loader = MTKTextureLoader(device: metalContext.device)
         

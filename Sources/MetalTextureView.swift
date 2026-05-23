@@ -7,8 +7,11 @@
 
 import SwiftUI
 import MetalKit
+#if os(macOS)
+import AppKit
+#endif
 
-struct MetalTextureView: UIViewRepresentable {
+struct MetalTextureView: PlatformViewRepresentable {
     
     let metalContext: MetalContext
     let texture: MTLTexture
@@ -19,14 +22,22 @@ struct MetalTextureView: UIViewRepresentable {
         Coordinator(metalContext: metalContext, texture: texture, mapping: mapping)
     }
     
+    #if os(macOS)
+    func makeNSView(context: Context) -> MTKView {
+        let view = MTKView(frame: .zero, device: metalContext.device)
+        configure(view: view, coordinator: context.coordinator)
+        return view
+    }
+
+    func updateNSView(_ nsView: MTKView, context: Context) {
+        context.coordinator.texture = texture
+        context.coordinator.mapping = mapping
+        nsView.setNeedsDisplay(nsView.bounds)
+    }
+    #else
     func makeUIView(context: Context) -> MTKView {
         let view = MTKView(frame: .zero, device: metalContext.device)
-        view.colorPixelFormat = .bgra8Unorm
-        view.delegate = context.coordinator
-        view.isPaused = true
-        view.enableSetNeedsDisplay = true
-        view.isOpaque = false
-        view.backgroundColor = .clear
+        configure(view: view, coordinator: context.coordinator)
         return view
     }
     
@@ -34,6 +45,23 @@ struct MetalTextureView: UIViewRepresentable {
         context.coordinator.texture = texture
         context.coordinator.mapping = mapping
         uiView.setNeedsDisplay()
+    }
+    #endif
+
+    private func configure(view: MTKView, coordinator: Coordinator) {
+        view.colorPixelFormat = .bgra8Unorm
+        view.delegate = coordinator
+        view.isPaused = true
+        view.enableSetNeedsDisplay = true
+        
+        #if os(macOS)
+        view.wantsLayer = true
+        view.layer?.isOpaque = false
+        view.layer?.backgroundColor = NSColor.clear.cgColor
+        #else
+        view.isOpaque = false
+        view.backgroundColor = .clear
+        #endif
     }
 }
 

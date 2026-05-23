@@ -5,8 +5,10 @@
 //  Created by Wrydrick Gutierrez on 7/5/26.
 //
 
-import UIKit
 import MetalKit
+#if canImport(UIKit)
+import UIKit
+#endif
 
 typealias TextureMapping = UVTransform
 
@@ -65,6 +67,7 @@ struct UVTransform {
     static let rotate90CounterClockwise = UVTransform(matrix: .init(columns: ([0.0, 1.0], [-1.0, 0.0])), offset: [0.0, 1.0])
 }
 
+#if canImport(UIKit)
 extension UIImage.Orientation {
     
     /// Maps UIKit image-orientation metadata to a UV transform.
@@ -89,3 +92,4 @@ extension UIImage.Orientation {
         }
     }
 }
+#endif

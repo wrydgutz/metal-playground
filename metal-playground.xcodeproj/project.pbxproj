@@ -26,9 +26,38 @@
 		9E7BAD9D2FBB1A9000D9E2DC /* Sepia.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD9C2FBB1A9000D9E2DC /* Sepia.metal */; };
 		9E7BADA02FBB1B4F00D9E2DC /* Grayscale.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD9F2FBB1B4F00D9E2DC /* Grayscale.metal */; };
 		9E7BADA32FBB1DA700D9E2DC /* Emboss.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BADA22FBB1DA700D9E2DC /* Emboss.metal */; };
-		9E7BADA52FBB25B100D9E2DC /* Emboss.md in Resources */ = {isa = PBXBuildFile; fileRef = 9E7BADA42FBB25AC00D9E2DC /* Emboss.md */; };
 		9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E82B6A12FAC8C45003795FD /* UVTransform.swift */; };
 		9E89FCF72FBFAAAE00586D17 /* Bloom.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E89FCF32FBF858800586D17 /* Bloom.metal */; };
+		9EA01F562FC1B31900EE4B86 /* MTLTexture+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */; };
+		9EA01F572FC1B31900EE4B86 /* UVTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E82B6A12FAC8C45003795FD /* UVTransform.swift */; };
+		9EA01F582FC1B31900EE4B86 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0618172FA9DDFF00264A1D /* ContentView.swift */; };
+		9EA01F592FC1B31900EE4B86 /* MetalPlaygroundApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0618152FA9DDFF00264A1D /* MetalPlaygroundApp.swift */; };
+		9EA01F5A2FC1B31900EE4B86 /* ConfigField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6BEC1E2FB538710083F119 /* ConfigField.swift */; };
+		9EA01F5B2FC1B31900EE4B86 /* ImageFiltersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E06184F2FA9DFB700264A1D /* ImageFiltersView.swift */; };
+		9EA01F5C2FC1B31900EE4B86 /* ImageFiltersViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0618532FAA01D000264A1D /* ImageFiltersViewModel.swift */; };
+		9EA01F5D2FC1B31900EE4B86 /* ConfigFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */; };
+		9EA01F5E2FC1B31900EE4B86 /* ImageFilterConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */; };
+		9EA01F5F2FC1B31900EE4B86 /* ImageFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98E2FAF68B000D41199 /* ImageFilter.swift */; };
+		9EA01F602FC1B31900EE4B86 /* MetalContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0A14CC2FAA5D8800113BC4 /* MetalContext.swift */; };
+		9EA01F612FC1B31900EE4B86 /* MetalTextureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E6B4BFB2FAA9F7E0007EFA7 /* MetalTextureView.swift */; };
+		9EA01F622FC1B31900EE4B86 /* Bloom.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E89FCF32FBF858800586D17 /* Bloom.metal */; };
+		9EA01F632FC1B31900EE4B86 /* BoxBlur.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD862FBB155A00D9E2DC /* BoxBlur.metal */; };
+		9EA01F642FC1B31900EE4B86 /* Brightness.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD962FBB199300D9E2DC /* Brightness.metal */; };
+		9EA01F652FC1B31900EE4B86 /* Contrast.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD932FBB192700D9E2DC /* Contrast.metal */; };
+		9EA01F662FC1B31900EE4B86 /* GaussianBlur.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD802FBB12F600D9E2DC /* GaussianBlur.metal */; };
+		9EA01F672FC1B31900EE4B86 /* Grayscale.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD9F2FBB1B4F00D9E2DC /* Grayscale.metal */; };
+		9EA01F682FC1B31900EE4B86 /* Invert.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD992FBB19FA00D9E2DC /* Invert.metal */; };
+		9EA01F692FC1B31900EE4B86 /* Sepia.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD9C2FBB1A9000D9E2DC /* Sepia.metal */; };
+		9EA01F6A2FC1B31900EE4B86 /* Sharpen.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD832FBB14CE00D9E2DC /* Sharpen.metal */; };
+		9EA01F6B2FC1B31900EE4B86 /* Sobel.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD792FBB0B7100D9E2DC /* Sobel.metal */; };
+		9EA01F6C2FC1B31900EE4B86 /* Threshold.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BAD902FBB181700D9E2DC /* Threshold.metal */; };
+		9EA01F6D2FC1B31900EE4B86 /* Emboss.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9E7BADA22FBB1DA700D9E2DC /* Emboss.metal */; };
+		9EA01F6E2FC1B31900EE4B86 /* TextureView.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EC7D2412FAB3219008606B8 /* TextureView.metal */; };
+		9EA01F702FC1B33500EE4B86 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9E0618192FA9DDFF00264A1D /* Assets.xcassets */; };
+		9EA01F772FC1B44700EE4B86 /* PlatformImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F752FC1B44700EE4B86 /* PlatformImage.swift */; };
+		9EA01F782FC1B44700EE4B86 /* PlatformImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F752FC1B44700EE4B86 /* PlatformImage.swift */; };
+		9EA01F7A2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */; };
+		9EA01F7B2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */; };
 		9EA1B9862FAF48CD00D41199 /* ConfigFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */; };
 		9EA1B98B2FAF647800D41199 /* MTLTexture+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */; };
 		9EA1B98D2FAF667600D41199 /* ImageFilterConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */; };
@@ -72,6 +101,9 @@
 		9E82B6A12FAC8C45003795FD /* UVTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UVTransform.swift; sourceTree = "<group>"; };
 		9E89FCF32FBF858800586D17 /* Bloom.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Bloom.metal; sourceTree = "<group>"; };
 		9E89FCF52FBFA94700586D17 /* Bloom.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Bloom.md; sourceTree = "<group>"; };
+		9EA01F4B2FC1B2C900EE4B86 /* metal-playground-mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "metal-playground-mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9EA01F752FC1B44700EE4B86 /* PlatformImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformImage.swift; sourceTree = "<group>"; };
+		9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformViewRepresentable.swift; sourceTree = "<group>"; };
 		9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigFieldView.swift; sourceTree = "<group>"; };
 		9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLTexture+Extensions.swift"; sourceTree = "<group>"; };
 		9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterConfig.swift; sourceTree = "<group>"; };
@@ -81,6 +113,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		9E06180F2FA9DDFF00264A1D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EA01F482FC1B2C900EE4B86 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -103,6 +142,7 @@
 			isa = PBXGroup;
 			children = (
 				9E0618122FA9DDFF00264A1D /* metal-playground.app */,
+				9EA01F4B2FC1B2C900EE4B86 /* metal-playground-mac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -112,10 +152,11 @@
 			children = (
 				9EA1B9892FAF646900D41199 /* Extensions */,
 				9E82B6A02FAC8BF2003795FD /* Math */,
-				9E25482F2FABDB83007818BB /* UI */,
 				9E0A14CC2FAA5D8800113BC4 /* MetalContext.swift */,
 				9E6B4BFB2FAA9F7E0007EFA7 /* MetalTextureView.swift */,
+				9EA01F762FC1B44700EE4B86 /* Platform */,
 				9E25482D2FABDB0F007818BB /* Shaders */,
+				9E25482F2FABDB83007818BB /* UI */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -200,6 +241,15 @@
 			path = Math;
 			sourceTree = "<group>";
 		};
+		9EA01F762FC1B44700EE4B86 /* Platform */ = {
+			isa = PBXGroup;
+			children = (
+				9EA01F752FC1B44700EE4B86 /* PlatformImage.swift */,
+				9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */,
+			);
+			path = Platform;
+			sourceTree = "<group>";
+		};
 		9EA1B9892FAF646900D41199 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -230,6 +280,25 @@
 			productReference = 9E0618122FA9DDFF00264A1D /* metal-playground.app */;
 			productType = "com.apple.product-type.application";
 		};
+		9EA01F4A2FC1B2C900EE4B86 /* metal-playground-mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9EA01F552FC1B2CA00EE4B86 /* Build configuration list for PBXNativeTarget "metal-playground-mac" */;
+			buildPhases = (
+				9EA01F472FC1B2C900EE4B86 /* Sources */,
+				9EA01F482FC1B2C900EE4B86 /* Frameworks */,
+				9EA01F492FC1B2C900EE4B86 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "metal-playground-mac";
+			packageProductDependencies = (
+			);
+			productName = "metal-playground-mac";
+			productReference = 9EA01F4B2FC1B2C900EE4B86 /* metal-playground-mac.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -241,6 +310,9 @@
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					9E0618112FA9DDFF00264A1D = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					9EA01F4A2FC1B2C900EE4B86 = {
 						CreatedOnToolsVersion = 26.3;
 					};
 				};
@@ -260,6 +332,7 @@
 			projectRoot = "";
 			targets = (
 				9E0618112FA9DDFF00264A1D /* metal-playground */,
+				9EA01F4A2FC1B2C900EE4B86 /* metal-playground-mac */,
 			);
 		};
 /* End PBXProject section */
@@ -270,7 +343,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				9E06181A2FA9DDFF00264A1D /* Assets.xcassets in Resources */,
-				9E7BADA52FBB25B100D9E2DC /* Emboss.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EA01F492FC1B2C900EE4B86 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9EA01F702FC1B33500EE4B86 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,10 +363,12 @@
 			files = (
 				9E7BAD7A2FBB0B7100D9E2DC /* Sobel.metal in Sources */,
 				9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */,
+				9EA01F772FC1B44700EE4B86 /* PlatformImage.swift in Sources */,
 				9EA1B98F2FAF68B000D41199 /* ImageFilter.swift in Sources */,
 				9E7BADA02FBB1B4F00D9E2DC /* Grayscale.metal in Sources */,
 				9E7BAD812FBB12F600D9E2DC /* GaussianBlur.metal in Sources */,
 				9E7BAD842FBB14CE00D9E2DC /* Sharpen.metal in Sources */,
+				9EA01F7A2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */,
 				9E7BADA32FBB1DA700D9E2DC /* Emboss.metal in Sources */,
 				9E0A14CD2FAA5D8B00113BC4 /* MetalContext.swift in Sources */,
 				9EA1B9862FAF48CD00D41199 /* ConfigFieldView.swift in Sources */,
@@ -306,6 +388,40 @@
 				9EA1B98B2FAF647800D41199 /* MTLTexture+Extensions.swift in Sources */,
 				9E7BAD972FBB199300D9E2DC /* Brightness.metal in Sources */,
 				9E7BAD9A2FBB19FA00D9E2DC /* Invert.metal in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9EA01F472FC1B2C900EE4B86 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9EA01F562FC1B31900EE4B86 /* MTLTexture+Extensions.swift in Sources */,
+				9EA01F572FC1B31900EE4B86 /* UVTransform.swift in Sources */,
+				9EA01F782FC1B44700EE4B86 /* PlatformImage.swift in Sources */,
+				9EA01F582FC1B31900EE4B86 /* ContentView.swift in Sources */,
+				9EA01F592FC1B31900EE4B86 /* MetalPlaygroundApp.swift in Sources */,
+				9EA01F5A2FC1B31900EE4B86 /* ConfigField.swift in Sources */,
+				9EA01F5B2FC1B31900EE4B86 /* ImageFiltersView.swift in Sources */,
+				9EA01F7B2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */,
+				9EA01F5C2FC1B31900EE4B86 /* ImageFiltersViewModel.swift in Sources */,
+				9EA01F5D2FC1B31900EE4B86 /* ConfigFieldView.swift in Sources */,
+				9EA01F5E2FC1B31900EE4B86 /* ImageFilterConfig.swift in Sources */,
+				9EA01F5F2FC1B31900EE4B86 /* ImageFilter.swift in Sources */,
+				9EA01F602FC1B31900EE4B86 /* MetalContext.swift in Sources */,
+				9EA01F612FC1B31900EE4B86 /* MetalTextureView.swift in Sources */,
+				9EA01F622FC1B31900EE4B86 /* Bloom.metal in Sources */,
+				9EA01F632FC1B31900EE4B86 /* BoxBlur.metal in Sources */,
+				9EA01F642FC1B31900EE4B86 /* Brightness.metal in Sources */,
+				9EA01F652FC1B31900EE4B86 /* Contrast.metal in Sources */,
+				9EA01F662FC1B31900EE4B86 /* GaussianBlur.metal in Sources */,
+				9EA01F672FC1B31900EE4B86 /* Grayscale.metal in Sources */,
+				9EA01F682FC1B31900EE4B86 /* Invert.metal in Sources */,
+				9EA01F692FC1B31900EE4B86 /* Sepia.metal in Sources */,
+				9EA01F6A2FC1B31900EE4B86 /* Sharpen.metal in Sources */,
+				9EA01F6B2FC1B31900EE4B86 /* Sobel.metal in Sources */,
+				9EA01F6C2FC1B31900EE4B86 /* Threshold.metal in Sources */,
+				9EA01F6D2FC1B31900EE4B86 /* Emboss.metal in Sources */,
+				9EA01F6E2FC1B31900EE4B86 /* TextureView.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -497,6 +613,74 @@
 			};
 			name = Release;
 		};
+		9EA01F532FC1B2CA00EE4B86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 78JSN3DM9T;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wrydgutz.metal-playground-mac";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		9EA01F542FC1B2CA00EE4B86 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 78JSN3DM9T;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.wrydgutz.metal-playground-mac";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -514,6 +698,15 @@
 			buildConfigurations = (
 				9E06181E2FA9DDFF00264A1D /* Debug */,
 				9E06181F2FA9DDFF00264A1D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9EA01F552FC1B2CA00EE4B86 /* Build configuration list for PBXNativeTarget "metal-playground-mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9EA01F532FC1B2CA00EE4B86 /* Debug */,
+				9EA01F542FC1B2CA00EE4B86 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

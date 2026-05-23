@@ -12,7 +12,7 @@ extension Float: Scalar {}
 extension UInt: Scalar {}
 
 protocol MTLComputeEncodable {
-    func encode(into encoder: MTLComputeCommandEncoder, index: Int)
+    func setBytes(to encoder: MTLComputeCommandEncoder, index: Int)
 }
 
 final class ConfigField<T: Scalar>: MTLComputeEncodable {
@@ -26,7 +26,7 @@ final class ConfigField<T: Scalar>: MTLComputeEncodable {
         self.range = range
     }
     
-    func encode(into encoder: MTLComputeCommandEncoder, index: Int) {
+    func setBytes(to encoder: MTLComputeCommandEncoder, index: Int) {
         var value = value
         encoder.setBytes(&value, length: MemoryLayout<T>.size, index: index)
     }
@@ -48,15 +48,15 @@ struct AnyConfigField: MTLComputeEncodable, Identifiable {
     var id: UUID = UUID()
     
     var name: String
-    var encoderFunc: (MTLComputeCommandEncoder, Int) -> Void
+    var setBytesFunc: (MTLComputeCommandEncoder, Int) -> Void
     private var getValueFunc: () -> Float
     private var setValueFunc: (Float) -> Void
     private var getRangeFunc: () -> ClosedRange<Float>
     
     init(_ field: ConfigField<Float>) {
         self.name = field.name
-        self.encoderFunc = { encoder, index in
-            field.encode(into: encoder, index: index)
+        self.setBytesFunc = { encoder, index in
+            field.setBytes(to: encoder, index: index)
         }
         
         self.getValueFunc = {
@@ -74,8 +74,8 @@ struct AnyConfigField: MTLComputeEncodable, Identifiable {
     
     init(_ field: ConfigField<UInt>) {
         self.name = field.name
-        self.encoderFunc = { encoder, index in
-            field.encode(into: encoder, index: index)
+        self.setBytesFunc = { encoder, index in
+            field.setBytes(to: encoder, index: index)
         }
         
         self.getValueFunc = {
@@ -103,7 +103,7 @@ struct AnyConfigField: MTLComputeEncodable, Identifiable {
         getRangeFunc()
     }
     
-    func encode(into encoder: MTLComputeCommandEncoder, index: Int) {
-        encoderFunc(encoder, index)
+    func setBytes(to encoder: MTLComputeCommandEncoder, index: Int) {
+        setBytesFunc(encoder, index)
     }
 }

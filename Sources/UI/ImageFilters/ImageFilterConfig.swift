@@ -15,9 +15,9 @@ protocol ImageFilterConfig {
 
 extension ImageFilterConfig {
     
-    func encode(into encoder: MTLComputeCommandEncoder) {
+    func setBytes(to encoder: MTLComputeCommandEncoder) {
         for i in 0..<fields.count {
-            fields[i].encode(into: encoder, index: i)
+            fields[i].setBytes(to: encoder, index: i)
         }
     }
 }

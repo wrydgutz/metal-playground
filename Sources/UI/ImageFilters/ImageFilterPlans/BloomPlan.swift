@@ -46,7 +46,7 @@ struct BloomPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(inputTexture, index: 0)
                 encoder.setTexture(brightOutputTexture, index: 1)
-                bloomConfig.threshold.encode(into: encoder, index: 0)
+                bloomConfig.threshold.setBytes(to: encoder, index: 0)
             },
             
             // Gaussian Blur Passes
@@ -55,7 +55,7 @@ struct BloomPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(brightOutputTexture, index: 0)
                 encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 1)
-                bloomConfig.radius.encode(into: encoder, index: 0)
+                bloomConfig.radius.setBytes(to: encoder, index: 0)
                 encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)
             },
             
@@ -64,7 +64,7 @@ struct BloomPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 0)
                 encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
-                bloomConfig.radius.encode(into: encoder, index: 0) // Radius
+                bloomConfig.radius.setBytes(to: encoder, index: 0) // Radius
                 encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)
             },
             
@@ -75,7 +75,7 @@ struct BloomPlan: ImageFilterPlan {
                 encoder.setTexture(inputTexture, index: 0)
                 encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
                 encoder.setTexture(context.outputTexture, index: 2)
-                bloomConfig.intensity.encode(into: encoder, index: 0)
+                bloomConfig.intensity.setBytes(to: encoder, index: 0)
             }
         ]
     }

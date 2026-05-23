@@ -43,7 +43,7 @@ struct UnsharpMaskPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(inputTexture, index: 0)
                 encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 1)
-                unsharpMaskConfig.radius.encode(into: encoder, index: 0)
+                unsharpMaskConfig.radius.setBytes(to: encoder, index: 0)
                 encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)
             },
             
@@ -52,7 +52,7 @@ struct UnsharpMaskPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 0)
                 encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
-                unsharpMaskConfig.radius.encode(into: encoder, index: 0)
+                unsharpMaskConfig.radius.setBytes(to: encoder, index: 0)
                 encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)
             },
             
@@ -63,7 +63,7 @@ struct UnsharpMaskPlan: ImageFilterPlan {
                 encoder.setTexture(inputTexture, index: 0)
                 encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
                 encoder.setTexture(context.outputTexture, index: 2)
-                unsharpMaskConfig.amount.encode(into: encoder, index: 0)
+                unsharpMaskConfig.amount.setBytes(to: encoder, index: 0)
             }
         ]
     }

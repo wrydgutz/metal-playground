@@ -24,7 +24,7 @@ final class SinglePassPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
             encoder.setTexture(context.inputTexture, index: 0)
             encoder.setTexture(context.outputTexture, index: 1)
-            context.config?.encode(into: encoder)
+            context.config?.setBytes(to: encoder)
         }]
     }
 }

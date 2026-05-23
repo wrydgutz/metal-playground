@@ -33,7 +33,7 @@ struct BoxBlurTwoPassPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(inputTexture, index: 0)
                 encoder.setTexture(tempTexture, index: 1)
-                config.encode(into: encoder)
+                config.setBytes(to: encoder)
             },
             
             PassDescriptor(pipelineState: verticalPSO,
@@ -41,7 +41,7 @@ struct BoxBlurTwoPassPlan: ImageFilterPlan {
                            threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                 encoder.setTexture(tempTexture, index: 0)
                 encoder.setTexture(context.outputTexture, index: 1)
-                config.encode(into: encoder)
+                config.setBytes(to: encoder)
             }
         ]
     }

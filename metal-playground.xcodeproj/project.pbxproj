@@ -58,6 +58,8 @@
 		9EA01F782FC1B44700EE4B86 /* PlatformImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F752FC1B44700EE4B86 /* PlatformImage.swift */; };
 		9EA01F7A2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */; };
 		9EA01F7B2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */; };
+		9EA01F812FC1C1F100EE4B86 /* UnsharpMask.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F802FC1C1F100EE4B86 /* UnsharpMask.metal */; };
+		9EA01F822FC1C1F100EE4B86 /* UnsharpMask.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F802FC1C1F100EE4B86 /* UnsharpMask.metal */; };
 		9EA1B9862FAF48CD00D41199 /* ConfigFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */; };
 		9EA1B98B2FAF647800D41199 /* MTLTexture+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */; };
 		9EA1B98D2FAF667600D41199 /* ImageFilterConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */; };
@@ -104,6 +106,8 @@
 		9EA01F4B2FC1B2C900EE4B86 /* metal-playground-mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "metal-playground-mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9EA01F752FC1B44700EE4B86 /* PlatformImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformImage.swift; sourceTree = "<group>"; };
 		9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformViewRepresentable.swift; sourceTree = "<group>"; };
+		9EA01F802FC1C1F100EE4B86 /* UnsharpMask.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = UnsharpMask.metal; sourceTree = "<group>"; };
+		9EA01F832FC1C82200EE4B86 /* UnsharpMask.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = UnsharpMask.md; sourceTree = "<group>"; };
 		9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigFieldView.swift; sourceTree = "<group>"; };
 		9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLTexture+Extensions.swift"; sourceTree = "<group>"; };
 		9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterConfig.swift; sourceTree = "<group>"; };
@@ -229,6 +233,8 @@
 				9E7BAD902FBB181700D9E2DC /* Threshold.metal */,
 				9E7BADA42FBB25AC00D9E2DC /* Emboss.md */,
 				9E7BADA22FBB1DA700D9E2DC /* Emboss.metal */,
+				9EA01F832FC1C82200EE4B86 /* UnsharpMask.md */,
+				9EA01F802FC1C1F100EE4B86 /* UnsharpMask.metal */,
 			);
 			path = ImageFilters;
 			sourceTree = "<group>";
@@ -388,6 +394,7 @@
 				9EA1B98B2FAF647800D41199 /* MTLTexture+Extensions.swift in Sources */,
 				9E7BAD972FBB199300D9E2DC /* Brightness.metal in Sources */,
 				9E7BAD9A2FBB19FA00D9E2DC /* Invert.metal in Sources */,
+				9EA01F812FC1C1F100EE4B86 /* UnsharpMask.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -422,6 +429,7 @@
 				9EA01F6C2FC1B31900EE4B86 /* Threshold.metal in Sources */,
 				9EA01F6D2FC1B31900EE4B86 /* Emboss.metal in Sources */,
 				9EA01F6E2FC1B31900EE4B86 /* TextureView.metal in Sources */,
+				9EA01F822FC1C1F100EE4B86 /* UnsharpMask.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

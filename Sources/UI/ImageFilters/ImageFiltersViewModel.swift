@@ -58,6 +58,11 @@ final class ImageFiltersViewModel {
             ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...30),
             ConfigField<Float>.make(name: "Intensity", value: 0.5, range: 0.0...1.0)
         ])
+        
+        filterConfigs[.unsharpMask] = ImageFilterConfig(fields: [
+            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...30),
+            ConfigField<Float>.make(name: "Amount", value: 0.5, range: 0.0...2.0)
+        ])
     }
     
     func select(filter: ImageFilter) {

@@ -23,6 +23,7 @@ enum ImageFilter: CaseIterable, Identifiable {
     case sobelEdgeDetection
     case emboss
     case bloom
+    case unsharpMask
     
     var id: Self { self }
     var title: String {
@@ -42,6 +43,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .sobelEdgeDetection: "Sobel Edge Detection"
             case .emboss: "Emboss"
             case .bloom: "Bloom"
+            case .unsharpMask: "Unsharp Mask"
         }
     }
     
@@ -61,6 +63,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .sobelEdgeDetection: return [.sobelEdgeDetection]
             case .emboss: return [.emboss]
             case .bloom: return [.bloomBright, .gaussianBlurTwoPassHorizontal, .gaussianBlurTwoPassVertical, .bloomCombine]
+            case .unsharpMask: return [.gaussianBlurTwoPassHorizontal, .gaussianBlurTwoPassVertical, .unsharpMask]
             default: return []
         }
     }
@@ -91,6 +94,13 @@ enum ImageFilter: CaseIterable, Identifiable {
                                      inputTexture: inputTexture,
                                      outputTexture: outputTexture,
                                      config: config)
+                
+            case .unsharpMask:
+                return try UnsharpMaskPlan(metalContext: metalContext,
+                                           kernels: kernels,
+                                           inputTexture: inputTexture,
+                                           outputTexture: outputTexture,
+                                           config: config)
                 
             default:
                 return try SinglePassPlan(metalContext: metalContext,
@@ -278,6 +288,70 @@ extension ImageFilter {
                     encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
                     encoder.setTexture(outputTexture, index: 2)
                     config.fields[2].encode(into: encoder, index: 0) // Intensity
+                }
+            ]
+        }
+    }
+    
+    enum UnsharpMaskPlanError: Error {
+        case incorrectKernelCount
+        case missingConfig
+        case failedToCreateTemporaryTexture
+    }
+
+    struct UnsharpMaskPlan: ImageFilterPlan {
+    
+        var passes: [ImageFilter.PassDescriptor]
+        
+        init(metalContext: MetalContext,
+             kernels: [ComputeKernel],
+             inputTexture: MTLTexture,
+             outputTexture: MTLTexture,
+             config: ImageFilterConfig?
+        ) throws {
+            guard kernels.count == ImageFilter.unsharpMask.kernels.count else { throw UnsharpMaskPlanError.incorrectKernelCount }
+            guard let config = config else { throw BloomPlanError.missingConfig }
+            
+            let gaussianBlurHorizontalPSO = try metalContext.computePipelineState(for: kernels[0])
+            let gaussianBlurVerticalPSO = try metalContext.computePipelineState(for: kernels[1])
+            let combinePSO = try metalContext.computePipelineState(for: kernels[2])
+            
+            guard let gaussianBlurHorizontalOutputTexture = inputTexture.makeEmptyCopy(device: metalContext.device) else { throw UnsharpMaskPlanError.failedToCreateTemporaryTexture }
+            guard let gaussianBlurVerticalOutputTexture = inputTexture.makeEmptyCopy(device: metalContext.device) else { throw UnsharpMaskPlanError.failedToCreateTemporaryTexture }
+            
+            let threadgroupsPerGrid = MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: inputTexture)
+            
+            var blurSigma: Float = config.fields[0].getValue() / 3
+            
+            self.passes = [
+                
+                // Gaussian Blur Passes
+                PassDescriptor(pipelineState: gaussianBlurHorizontalPSO,
+                               threadgroupsPerGrid: threadgroupsPerGrid,
+                               threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                    encoder.setTexture(inputTexture, index: 0)
+                    encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 1)
+                    config.fields[0].encode(into: encoder, index: 0) // Radius
+                    encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)  // Sigma
+                },
+                
+                PassDescriptor(pipelineState: gaussianBlurVerticalPSO,
+                               threadgroupsPerGrid: threadgroupsPerGrid,
+                               threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                    encoder.setTexture(gaussianBlurHorizontalOutputTexture, index: 0)
+                    encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
+                    config.fields[0].encode(into: encoder, index: 0) // Radius
+                    encoder.setBytes(&blurSigma, length: MemoryLayout<Float>.size, index: 1)  // Sigma
+                },
+                
+                // Combine Pass
+                PassDescriptor(pipelineState: combinePSO,
+                               threadgroupsPerGrid: threadgroupsPerGrid,
+                               threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
+                    encoder.setTexture(inputTexture, index: 0)
+                    encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
+                    encoder.setTexture(outputTexture, index: 2)
+                    config.fields[1].encode(into: encoder, index: 0) // Amount
                 }
             ]
         }

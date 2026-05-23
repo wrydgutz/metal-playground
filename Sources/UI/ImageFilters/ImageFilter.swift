@@ -71,45 +71,30 @@ enum ImageFilter: CaseIterable, Identifiable {
     func makePlan(metalContext: MetalContext,
                   inputTexture: MTLTexture,
                   outputTexture: MTLTexture,
-                  config: ImageFilterConfig?
-    ) throws -> ImageFilterPlan? {
+                  config: ImageFilterConfig?) throws -> ImageFilterPlan? {
+        
+        let context = PlanContext(metalContext: metalContext,
+                                  kernels: self.kernels,
+                                  inputTexture: inputTexture,
+                                  outputTexture: outputTexture,
+                                  config: config)
+        
         switch self {
-            case .boxBlurTwoPass:
-                return try BoxBlurTwoPassPlan(metalContext: metalContext,
-                                              kernels: kernels,
-                                              inputTexture: inputTexture,
-                                              outputTexture: outputTexture,
-                                              config: config)
-                
-            case .gaussianBlurTwoPass:
-                return try GaussianBlurTwoPassPlan(metalContext: metalContext,
-                                                   kernels: kernels,
-                                                   inputTexture: inputTexture,
-                                                   outputTexture: outputTexture,
-                                                   config: config)
-                
-            case .bloom:
-                return try BloomPlan(metalContext: metalContext,
-                                     kernels: kernels,
-                                     inputTexture: inputTexture,
-                                     outputTexture: outputTexture,
-                                     config: config)
-                
-            case .unsharpMask:
-                return try UnsharpMaskPlan(metalContext: metalContext,
-                                           kernels: kernels,
-                                           inputTexture: inputTexture,
-                                           outputTexture: outputTexture,
-                                           config: config)
-                
-            default:
-                return try SinglePassPlan(metalContext: metalContext,
-                                          kernels: kernels,
-                                          inputTexture: inputTexture,
-                                          outputTexture: outputTexture,
-                                          config: config)
+            case .boxBlurTwoPass: return try BoxBlurTwoPassPlan(context: context)
+            case .gaussianBlurTwoPass: return try GaussianBlurTwoPassPlan(context: context)
+            case .bloom: return try BloomPlan(context: context)
+            case .unsharpMask: return try UnsharpMaskPlan(context: context)
+            default: return try SinglePassPlan(context: context)
         }
     }
+}
+
+struct PlanContext {
+    let metalContext: MetalContext
+    let kernels: [ComputeKernel]
+    let inputTexture: MTLTexture
+    let outputTexture: MTLTexture
+    let config: ImageFilterConfig?
 }
 
 protocol ImageFilterPlan {
@@ -150,23 +135,18 @@ extension ImageFilter {
     
         var passes: [ImageFilter.PassDescriptor]
         
-        init(metalContext: MetalContext,
-             kernels: [ComputeKernel],
-             inputTexture: MTLTexture,
-             outputTexture: MTLTexture,
-             config: ImageFilterConfig?
-        ) throws {
-            guard kernels.count == 1 else { throw SinglePassPlanError.moreThanOneKernel }
-            guard let kernel = kernels.first else { throw SinglePassPlanError.noKernel }
+        init(context: PlanContext) throws {
+            guard context.kernels.count == 1 else { throw SinglePassPlanError.moreThanOneKernel }
+            guard let kernel = context.kernels.first else { throw SinglePassPlanError.noKernel }
             
-            let pso = try metalContext.computePipelineState(for: kernel)
+            let pso = try context.metalContext.computePipelineState(for: kernel)
             
             let pass = PassDescriptor(pipelineState: pso,
-                                      threadgroupsPerGrid: MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: inputTexture),
+                                      threadgroupsPerGrid: MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: context.inputTexture),
                                       threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
-                encoder.setTexture(inputTexture, index: 0)
-                encoder.setTexture(outputTexture, index: 1)
-                config?.encode(into: encoder)
+                encoder.setTexture(context.inputTexture, index: 0)
+                encoder.setTexture(context.outputTexture, index: 1)
+                context.config?.encode(into: encoder)
             }
             self.passes = [pass]
         }
@@ -174,6 +154,7 @@ extension ImageFilter {
     
     enum BoxBlurTwoPassPlanError: Error {
         case incorrectKernelCount
+        case missingConfig
         case failedToCreateTemporaryTexture
     }
 
@@ -181,16 +162,15 @@ extension ImageFilter {
     
         var passes: [ImageFilter.PassDescriptor]
         
-        init(metalContext: MetalContext,
-             kernels: [ComputeKernel],
-             inputTexture: MTLTexture,
-             outputTexture: MTLTexture,
-             config: ImageFilterConfig?
-        ) throws {
-            guard kernels.count == 2 else { throw BoxBlurTwoPassPlanError.incorrectKernelCount }
+        init(context: PlanContext) throws {
+            guard context.kernels.count == 2 else { throw BoxBlurTwoPassPlanError.incorrectKernelCount }
+            guard let config = context.config else { throw BloomPlanError.missingConfig }
             
-            let horizontalPSO = try metalContext.computePipelineState(for: kernels[0])
-            let verticalPSO = try metalContext.computePipelineState(for: kernels[1])
+            let metalContext = context.metalContext
+            let inputTexture = context.inputTexture
+            
+            let horizontalPSO = try metalContext.computePipelineState(for: context.kernels[0])
+            let verticalPSO = try metalContext.computePipelineState(for: context.kernels[1])
             guard let tempTexture = inputTexture.makeEmptyCopy(device: metalContext.device) else { throw BoxBlurTwoPassPlanError.failedToCreateTemporaryTexture }
             
             let threadgroupsPerGrid = MetalContext.threadgroupsPerGridForFullCoverage(inputTexture: inputTexture)
@@ -202,15 +182,15 @@ extension ImageFilter {
                                threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                     encoder.setTexture(inputTexture, index: 0)
                     encoder.setTexture(tempTexture, index: 1)
-                    config?.encode(into: encoder)
+                    config.encode(into: encoder)
                 },
                 
                 PassDescriptor(pipelineState: verticalPSO,
                                threadgroupsPerGrid: threadgroupsPerGrid,
                                threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                     encoder.setTexture(tempTexture, index: 0)
-                    encoder.setTexture(outputTexture, index: 1)
-                    config?.encode(into: encoder)
+                    encoder.setTexture(context.outputTexture, index: 1)
+                    config.encode(into: encoder)
                 }
             ]
         }
@@ -228,14 +208,13 @@ extension ImageFilter {
     
         var passes: [ImageFilter.PassDescriptor]
         
-        init(metalContext: MetalContext,
-             kernels: [ComputeKernel],
-             inputTexture: MTLTexture,
-             outputTexture: MTLTexture,
-             config: ImageFilterConfig?
-        ) throws {
+        init(context: PlanContext) throws {
+            let kernels = context.kernels
             guard kernels.count == ImageFilter.bloom.kernels.count else { throw BloomPlanError.incorrectKernelCount }
-            guard let config = config else { throw BloomPlanError.missingConfig }
+            guard let config = context.config else { throw BloomPlanError.missingConfig }
+            
+            let metalContext = context.metalContext
+            let inputTexture = context.inputTexture
             
             let brightPSO = try metalContext.computePipelineState(for: kernels[0])
             let gaussianBlurHorizontalPSO = try metalContext.computePipelineState(for: kernels[1])
@@ -286,7 +265,7 @@ extension ImageFilter {
                                threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                     encoder.setTexture(inputTexture, index: 0)
                     encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
-                    encoder.setTexture(outputTexture, index: 2)
+                    encoder.setTexture(context.outputTexture, index: 2)
                     config.fields[2].encode(into: encoder, index: 0) // Intensity
                 }
             ]
@@ -303,14 +282,13 @@ extension ImageFilter {
     
         var passes: [ImageFilter.PassDescriptor]
         
-        init(metalContext: MetalContext,
-             kernels: [ComputeKernel],
-             inputTexture: MTLTexture,
-             outputTexture: MTLTexture,
-             config: ImageFilterConfig?
-        ) throws {
-            guard kernels.count == ImageFilter.unsharpMask.kernels.count else { throw UnsharpMaskPlanError.incorrectKernelCount }
-            guard let config = config else { throw BloomPlanError.missingConfig }
+        init(context: PlanContext) throws {
+            let kernels = context.kernels
+            guard context.kernels.count == ImageFilter.unsharpMask.kernels.count else { throw UnsharpMaskPlanError.incorrectKernelCount }
+            guard let config = context.config else { throw BloomPlanError.missingConfig }
+            
+            let metalContext = context.metalContext
+            let inputTexture = context.inputTexture
             
             let gaussianBlurHorizontalPSO = try metalContext.computePipelineState(for: kernels[0])
             let gaussianBlurVerticalPSO = try metalContext.computePipelineState(for: kernels[1])
@@ -350,7 +328,7 @@ extension ImageFilter {
                                threadsPerThreadgroup: MetalContext.defaultThreadsPerThreadgroup) { encoder in
                     encoder.setTexture(inputTexture, index: 0)
                     encoder.setTexture(gaussianBlurVerticalOutputTexture, index: 1)
-                    encoder.setTexture(outputTexture, index: 2)
+                    encoder.setTexture(context.outputTexture, index: 2)
                     config.fields[1].encode(into: encoder, index: 0) // Amount
                 }
             ]

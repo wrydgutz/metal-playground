@@ -60,6 +60,16 @@
 		9EA01F7B2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */; };
 		9EA01F812FC1C1F100EE4B86 /* UnsharpMask.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F802FC1C1F100EE4B86 /* UnsharpMask.metal */; };
 		9EA01F822FC1C1F100EE4B86 /* UnsharpMask.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F802FC1C1F100EE4B86 /* UnsharpMask.metal */; };
+		9EA01F872FC1CF6000EE4B86 /* ImageFilterPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F862FC1CF6000EE4B86 /* ImageFilterPlan.swift */; };
+		9EA01F882FC1CF6000EE4B86 /* ImageFilterPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F862FC1CF6000EE4B86 /* ImageFilterPlan.swift */; };
+		9EA01F8B2FC1CFF800EE4B86 /* SinglePassPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F8A2FC1CFF800EE4B86 /* SinglePassPlan.swift */; };
+		9EA01F8C2FC1CFF800EE4B86 /* SinglePassPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F8A2FC1CFF800EE4B86 /* SinglePassPlan.swift */; };
+		9EA01F8E2FC1D0B700EE4B86 /* BoxBlurTwoPassPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F8D2FC1D0B700EE4B86 /* BoxBlurTwoPassPlan.swift */; };
+		9EA01F8F2FC1D0B700EE4B86 /* BoxBlurTwoPassPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F8D2FC1D0B700EE4B86 /* BoxBlurTwoPassPlan.swift */; };
+		9EA01F912FC1D18D00EE4B86 /* BloomPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F902FC1D18D00EE4B86 /* BloomPlan.swift */; };
+		9EA01F922FC1D18D00EE4B86 /* BloomPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F902FC1D18D00EE4B86 /* BloomPlan.swift */; };
+		9EA01F942FC1D1D500EE4B86 /* UnsharpMaskPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F932FC1D1D500EE4B86 /* UnsharpMaskPlan.swift */; };
+		9EA01F952FC1D1D500EE4B86 /* UnsharpMaskPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA01F932FC1D1D500EE4B86 /* UnsharpMaskPlan.swift */; };
 		9EA1B9862FAF48CD00D41199 /* ConfigFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */; };
 		9EA1B98B2FAF647800D41199 /* MTLTexture+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */; };
 		9EA1B98D2FAF667600D41199 /* ImageFilterConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */; };
@@ -108,6 +118,11 @@
 		9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformViewRepresentable.swift; sourceTree = "<group>"; };
 		9EA01F802FC1C1F100EE4B86 /* UnsharpMask.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = UnsharpMask.metal; sourceTree = "<group>"; };
 		9EA01F832FC1C82200EE4B86 /* UnsharpMask.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = UnsharpMask.md; sourceTree = "<group>"; };
+		9EA01F862FC1CF6000EE4B86 /* ImageFilterPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterPlan.swift; sourceTree = "<group>"; };
+		9EA01F8A2FC1CFF800EE4B86 /* SinglePassPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SinglePassPlan.swift; sourceTree = "<group>"; };
+		9EA01F8D2FC1D0B700EE4B86 /* BoxBlurTwoPassPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxBlurTwoPassPlan.swift; sourceTree = "<group>"; };
+		9EA01F902FC1D18D00EE4B86 /* BloomPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloomPlan.swift; sourceTree = "<group>"; };
+		9EA01F932FC1D1D500EE4B86 /* UnsharpMaskPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnsharpMaskPlan.swift; sourceTree = "<group>"; };
 		9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigFieldView.swift; sourceTree = "<group>"; };
 		9EA1B98A2FAF647800D41199 /* MTLTexture+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MTLTexture+Extensions.swift"; sourceTree = "<group>"; };
 		9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterConfig.swift; sourceTree = "<group>"; };
@@ -193,6 +208,8 @@
 				9E0618532FAA01D000264A1D /* ImageFiltersViewModel.swift */,
 				9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */,
 				9EA1B98E2FAF68B000D41199 /* ImageFilter.swift */,
+				9EA01F862FC1CF6000EE4B86 /* ImageFilterPlan.swift */,
+				9EA01F892FC1CFE500EE4B86 /* ImageFilterPlans */,
 			);
 			path = ImageFilters;
 			sourceTree = "<group>";
@@ -254,6 +271,17 @@
 				9EA01F792FC1B53700EE4B86 /* PlatformViewRepresentable.swift */,
 			);
 			path = Platform;
+			sourceTree = "<group>";
+		};
+		9EA01F892FC1CFE500EE4B86 /* ImageFilterPlans */ = {
+			isa = PBXGroup;
+			children = (
+				9EA01F8A2FC1CFF800EE4B86 /* SinglePassPlan.swift */,
+				9EA01F8D2FC1D0B700EE4B86 /* BoxBlurTwoPassPlan.swift */,
+				9EA01F902FC1D18D00EE4B86 /* BloomPlan.swift */,
+				9EA01F932FC1D1D500EE4B86 /* UnsharpMaskPlan.swift */,
+			);
+			path = ImageFilterPlans;
 			sourceTree = "<group>";
 		};
 		9EA1B9892FAF646900D41199 /* Extensions */ = {
@@ -376,12 +404,16 @@
 				9E7BAD842FBB14CE00D9E2DC /* Sharpen.metal in Sources */,
 				9EA01F7A2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */,
 				9E7BADA32FBB1DA700D9E2DC /* Emboss.metal in Sources */,
+				9EA01F952FC1D1D500EE4B86 /* UnsharpMaskPlan.swift in Sources */,
 				9E0A14CD2FAA5D8B00113BC4 /* MetalContext.swift in Sources */,
 				9EA1B9862FAF48CD00D41199 /* ConfigFieldView.swift in Sources */,
 				9E0618182FA9DDFF00264A1D /* ContentView.swift in Sources */,
 				9E7BAD872FBB155A00D9E2DC /* BoxBlur.metal in Sources */,
+				9EA01F8F2FC1D0B700EE4B86 /* BoxBlurTwoPassPlan.swift in Sources */,
+				9EA01F912FC1D18D00EE4B86 /* BloomPlan.swift in Sources */,
 				9E0618162FA9DDFF00264A1D /* MetalPlaygroundApp.swift in Sources */,
 				9E6B4BFC2FAA9F7E0007EFA7 /* MetalTextureView.swift in Sources */,
+				9EA01F8C2FC1CFF800EE4B86 /* SinglePassPlan.swift in Sources */,
 				9E7BAD9D2FBB1A9000D9E2DC /* Sepia.metal in Sources */,
 				9E0618542FAA01D500264A1D /* ImageFiltersViewModel.swift in Sources */,
 				9EC7D2422FAB3219008606B8 /* TextureView.metal in Sources */,
@@ -393,6 +425,7 @@
 				9E7BAD942FBB192700D9E2DC /* Contrast.metal in Sources */,
 				9EA1B98B2FAF647800D41199 /* MTLTexture+Extensions.swift in Sources */,
 				9E7BAD972FBB199300D9E2DC /* Brightness.metal in Sources */,
+				9EA01F872FC1CF6000EE4B86 /* ImageFilterPlan.swift in Sources */,
 				9E7BAD9A2FBB19FA00D9E2DC /* Invert.metal in Sources */,
 				9EA01F812FC1C1F100EE4B86 /* UnsharpMask.metal in Sources */,
 			);
@@ -411,12 +444,16 @@
 				9EA01F5B2FC1B31900EE4B86 /* ImageFiltersView.swift in Sources */,
 				9EA01F7B2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */,
 				9EA01F5C2FC1B31900EE4B86 /* ImageFiltersViewModel.swift in Sources */,
+				9EA01F942FC1D1D500EE4B86 /* UnsharpMaskPlan.swift in Sources */,
 				9EA01F5D2FC1B31900EE4B86 /* ConfigFieldView.swift in Sources */,
 				9EA01F5E2FC1B31900EE4B86 /* ImageFilterConfig.swift in Sources */,
 				9EA01F5F2FC1B31900EE4B86 /* ImageFilter.swift in Sources */,
 				9EA01F602FC1B31900EE4B86 /* MetalContext.swift in Sources */,
+				9EA01F8E2FC1D0B700EE4B86 /* BoxBlurTwoPassPlan.swift in Sources */,
+				9EA01F922FC1D18D00EE4B86 /* BloomPlan.swift in Sources */,
 				9EA01F612FC1B31900EE4B86 /* MetalTextureView.swift in Sources */,
 				9EA01F622FC1B31900EE4B86 /* Bloom.metal in Sources */,
+				9EA01F8B2FC1CFF800EE4B86 /* SinglePassPlan.swift in Sources */,
 				9EA01F632FC1B31900EE4B86 /* BoxBlur.metal in Sources */,
 				9EA01F642FC1B31900EE4B86 /* Brightness.metal in Sources */,
 				9EA01F652FC1B31900EE4B86 /* Contrast.metal in Sources */,
@@ -428,6 +465,7 @@
 				9EA01F6B2FC1B31900EE4B86 /* Sobel.metal in Sources */,
 				9EA01F6C2FC1B31900EE4B86 /* Threshold.metal in Sources */,
 				9EA01F6D2FC1B31900EE4B86 /* Emboss.metal in Sources */,
+				9EA01F882FC1CF6000EE4B86 /* ImageFilterPlan.swift in Sources */,
 				9EA01F6E2FC1B31900EE4B86 /* TextureView.metal in Sources */,
 				9EA01F822FC1C1F100EE4B86 /* UnsharpMask.metal in Sources */,
 			);

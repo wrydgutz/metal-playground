@@ -184,9 +184,9 @@
 			isa = PBXGroup;
 			children = (
 				9E6BEC1E2FB538710083F119 /* ConfigField.swift */,
+				9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */,
 				9E06184F2FA9DFB700264A1D /* ImageFiltersView.swift */,
 				9E0618532FAA01D000264A1D /* ImageFiltersViewModel.swift */,
-				9EA1B9852FAF48CD00D41199 /* ConfigFieldView.swift */,
 				9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */,
 				9EA1B98E2FAF68B000D41199 /* ImageFilter.swift */,
 			);

@@ -20,7 +20,6 @@ struct ConfigFieldView: View {
                 .padding(.trailing, 30)
             
             Slider(value: $value, in: range) {
-                Text(label)
             } minimumValueLabel: {
                 Text(String(format: "%.1f", range.lowerBound))
             } maximumValueLabel: {

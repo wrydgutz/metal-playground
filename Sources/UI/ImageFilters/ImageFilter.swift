@@ -24,6 +24,8 @@ enum ImageFilter: CaseIterable, Identifiable {
     case emboss
     case bloom
     case unsharpMask
+    case laplacianEdgeDetection
+    case laplacianSharpen
     
     var id: Self { self }
     var title: String {
@@ -44,6 +46,8 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .emboss: "Emboss"
             case .bloom: "Bloom"
             case .unsharpMask: "Unsharp Mask"
+            case .laplacianEdgeDetection: "Laplacian Edge Detection"
+            case .laplacianSharpen: "Laplacian Sharpen"
         }
     }
     
@@ -64,6 +68,8 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .emboss: return [.emboss]
             case .bloom: return [.bloomBright, .gaussianBlurTwoPassHorizontal, .gaussianBlurTwoPassVertical, .bloomCombine]
             case .unsharpMask: return [.gaussianBlurTwoPassHorizontal, .gaussianBlurTwoPassVertical, .unsharpMask]
+            case .laplacianEdgeDetection: return [.laplacianEdgeDetection]
+            case .laplacianSharpen: return [.gaussianBlurTwoPassHorizontal, .gaussianBlurTwoPassVertical, .laplacianEdgeDetection, .laplacianSharpen]
             default: return []
         }
     }
@@ -84,6 +90,7 @@ enum ImageFilter: CaseIterable, Identifiable {
             case .gaussianBlurTwoPass: return try GaussianBlurTwoPassPlan(context: context)
             case .bloom: return try BloomPlan(context: context)
             case .unsharpMask: return try UnsharpMaskPlan(context: context)
+            case .laplacianSharpen: return try LaplacianSharpenPlan(context: context)
             default: return try SinglePassPlan(context: context)
         }
     }

@@ -75,6 +75,10 @@
 		9EA1B98D2FAF667600D41199 /* ImageFilterConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */; };
 		9EA1B98F2FAF68B000D41199 /* ImageFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA1B98E2FAF68B000D41199 /* ImageFilter.swift */; };
 		9EC7D2422FAB3219008606B8 /* TextureView.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EC7D2412FAB3219008606B8 /* TextureView.metal */; };
+		9EDE543A2FC2FF9300CE1B0D /* LaplacianEdgeDetection.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EDE54392FC2FF9300CE1B0D /* LaplacianEdgeDetection.metal */; };
+		9EDE543B2FC2FF9300CE1B0D /* LaplacianEdgeDetection.metal in Sources */ = {isa = PBXBuildFile; fileRef = 9EDE54392FC2FF9300CE1B0D /* LaplacianEdgeDetection.metal */; };
+		9EDE543D2FC302E000CE1B0D /* LaplacianSharpenPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDE543C2FC302E000CE1B0D /* LaplacianSharpenPlan.swift */; };
+		9EDE543E2FC302E000CE1B0D /* LaplacianSharpenPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDE543C2FC302E000CE1B0D /* LaplacianSharpenPlan.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -110,6 +114,7 @@
 		9E7BADA12FBB1B7A00D9E2DC /* Grayscale.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Grayscale.md; sourceTree = "<group>"; };
 		9E7BADA22FBB1DA700D9E2DC /* Emboss.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Emboss.metal; sourceTree = "<group>"; };
 		9E7BADA42FBB25AC00D9E2DC /* Emboss.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Emboss.md; sourceTree = "<group>"; };
+		9E7C9A132FC398BB0008A210 /* LaplacianEdgeDetection.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LaplacianEdgeDetection.md; sourceTree = "<group>"; };
 		9E82B6A12FAC8C45003795FD /* UVTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UVTransform.swift; sourceTree = "<group>"; };
 		9E89FCF32FBF858800586D17 /* Bloom.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = Bloom.metal; sourceTree = "<group>"; };
 		9E89FCF52FBFA94700586D17 /* Bloom.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Bloom.md; sourceTree = "<group>"; };
@@ -128,6 +133,8 @@
 		9EA1B98C2FAF667600D41199 /* ImageFilterConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilterConfig.swift; sourceTree = "<group>"; };
 		9EA1B98E2FAF68B000D41199 /* ImageFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFilter.swift; sourceTree = "<group>"; };
 		9EC7D2412FAB3219008606B8 /* TextureView.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = TextureView.metal; sourceTree = "<group>"; };
+		9EDE54392FC2FF9300CE1B0D /* LaplacianEdgeDetection.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = LaplacianEdgeDetection.metal; sourceTree = "<group>"; };
+		9EDE543C2FC302E000CE1B0D /* LaplacianSharpenPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaplacianSharpenPlan.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -252,6 +259,8 @@
 				9E7BADA22FBB1DA700D9E2DC /* Emboss.metal */,
 				9EA01F832FC1C82200EE4B86 /* UnsharpMask.md */,
 				9EA01F802FC1C1F100EE4B86 /* UnsharpMask.metal */,
+				9EDE54392FC2FF9300CE1B0D /* LaplacianEdgeDetection.metal */,
+				9E7C9A132FC398BB0008A210 /* LaplacianEdgeDetection.md */,
 			);
 			path = ImageFilters;
 			sourceTree = "<group>";
@@ -280,6 +289,7 @@
 				9EA01F8D2FC1D0B700EE4B86 /* BoxBlurTwoPassPlan.swift */,
 				9EA01F902FC1D18D00EE4B86 /* BloomPlan.swift */,
 				9EA01F932FC1D1D500EE4B86 /* UnsharpMaskPlan.swift */,
+				9EDE543C2FC302E000CE1B0D /* LaplacianSharpenPlan.swift */,
 			);
 			path = ImageFilterPlans;
 			sourceTree = "<group>";
@@ -396,11 +406,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				9E7BAD7A2FBB0B7100D9E2DC /* Sobel.metal in Sources */,
+				9EDE543D2FC302E000CE1B0D /* LaplacianSharpenPlan.swift in Sources */,
 				9E82B6A22FAC8C47003795FD /* UVTransform.swift in Sources */,
 				9EA01F772FC1B44700EE4B86 /* PlatformImage.swift in Sources */,
 				9EA1B98F2FAF68B000D41199 /* ImageFilter.swift in Sources */,
 				9E7BADA02FBB1B4F00D9E2DC /* Grayscale.metal in Sources */,
 				9E7BAD812FBB12F600D9E2DC /* GaussianBlur.metal in Sources */,
+				9EDE543A2FC2FF9300CE1B0D /* LaplacianEdgeDetection.metal in Sources */,
 				9E7BAD842FBB14CE00D9E2DC /* Sharpen.metal in Sources */,
 				9EA01F7A2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */,
 				9E7BADA32FBB1DA700D9E2DC /* Emboss.metal in Sources */,
@@ -436,11 +448,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				9EA01F562FC1B31900EE4B86 /* MTLTexture+Extensions.swift in Sources */,
+				9EDE543E2FC302E000CE1B0D /* LaplacianSharpenPlan.swift in Sources */,
 				9EA01F572FC1B31900EE4B86 /* UVTransform.swift in Sources */,
 				9EA01F782FC1B44700EE4B86 /* PlatformImage.swift in Sources */,
 				9EA01F582FC1B31900EE4B86 /* ContentView.swift in Sources */,
 				9EA01F592FC1B31900EE4B86 /* MetalPlaygroundApp.swift in Sources */,
 				9EA01F5A2FC1B31900EE4B86 /* ConfigField.swift in Sources */,
+				9EDE543B2FC2FF9300CE1B0D /* LaplacianEdgeDetection.metal in Sources */,
 				9EA01F5B2FC1B31900EE4B86 /* ImageFiltersView.swift in Sources */,
 				9EA01F7B2FC1B53B00EE4B86 /* PlatformViewRepresentable.swift in Sources */,
 				9EA01F5C2FC1B31900EE4B86 /* ImageFiltersViewModel.swift in Sources */,

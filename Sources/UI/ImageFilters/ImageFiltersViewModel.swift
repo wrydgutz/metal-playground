@@ -30,7 +30,7 @@ final class ImageFiltersViewModel {
     }
     
     private func initConfigs() {
-        let oneArgFilters: [ImageFilter] = [.brightness, .contrast, .threshold, .sharpen]
+        let oneArgFilters: [ImageFilter] = [.brightness, .contrast, .threshold, .sharpen, .laplacianEdgeDetection]
         for filter in oneArgFilters {
             filterConfigs[filter] = SingleFieldConfig(name: "Factor", value: 0.5, range: 0.0...1.0)
         }
@@ -47,6 +47,7 @@ final class ImageFiltersViewModel {
         
         filterConfigs[.bloom] = BloomConfig()
         filterConfigs[.unsharpMask] = UnsharpMaskConfig()
+        filterConfigs[.laplacianSharpen] = LaplacianSharpenConfig()
     }
     
     func select(filter: ImageFilter) {

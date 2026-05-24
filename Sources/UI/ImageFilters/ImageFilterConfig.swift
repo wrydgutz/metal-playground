@@ -88,3 +88,20 @@ struct UnsharpMaskConfig: ImageFilterConfig {
         ]
     }
 }
+
+struct LaplacianSharpenConfig: ImageFilterConfig {
+    
+    var fields: [AnyConfigField]
+    
+    var radius: AnyConfigField { fields[0] }
+    var gain: AnyConfigField { fields[1] }
+    var amount: AnyConfigField { fields[2] }
+    
+    init() {
+        self.fields = [
+            ConfigField<UInt>.make(name: "Radius", value: 10, range: 0...30),
+            ConfigField<Float>.make(name: "Gain", value: 1, range: 0...5.0),
+            ConfigField<Float>.make(name: "Amount", value: 0.5, range: 0.0...2.0)
+        ]
+    }
+}

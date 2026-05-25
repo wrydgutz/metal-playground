@@ -72,7 +72,7 @@ struct ImageFiltersView: View {
                                 do {
                                     try viewModel.requestReprocess(filter: filter)
                                 } catch {
-                                    print("Error: \(error.localizedDescription)")
+                                    print("\(#function) - Error: \(error.localizedDescription)")
                                 }
                             }
                             .padding(.horizontal)

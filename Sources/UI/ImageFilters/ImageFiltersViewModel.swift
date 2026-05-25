@@ -70,7 +70,18 @@ final class ImageFiltersViewModel {
             loadFilterTextures(original: texture)
             try processFilterPreviews()
         } catch {
-            print("Error: \(error.localizedDescription)")
+            do {
+                guard let normalized = cgImage.normalizedForMTKTextureLoader() else {
+                    print("\(#function) - Error: \(error)")
+                    return
+                }
+                let texture = try loader.newTexture(cgImage: normalized)
+                displayTexture = texture
+                loadFilterTextures(original: texture)
+                try processFilterPreviews()
+            } catch {
+                print("\(#function) - Error: \(error)")
+            }
         }
         
         isProcessed = true
@@ -169,7 +180,7 @@ final class ImageFiltersViewModel {
                 do {
                     try await self.reprocessIfPossible(filter: filter)
                 } catch {
-                    print("Error: \(error.localizedDescription)")
+                    print("\(#function) - Error: \(error.localizedDescription)")
                 }
             }
         }

@@ -135,7 +135,7 @@ extension MetalTextureView {
                 let textureViewPSO = try metalContext.renderPipelineState(for: .textureView)
                 encoder.setRenderPipelineState(textureViewPSO)
             } catch {
-                print("Error: \(error.localizedDescription)")
+                print("\(#function) - Error: \(error.localizedDescription)")
             }
             
             // Set vertex shader args
